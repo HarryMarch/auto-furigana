@@ -7,6 +7,7 @@ Vue.createApp({
         const enableOnThisTab = Vue.ref(false);
         const showTranslationOnMouseHover = Vue.ref(false);
         const targetLanguage = Vue.ref('en');
+        const newWordInput = Vue.ref('');
 
         // ==========================================
 
@@ -73,6 +74,29 @@ Vue.createApp({
             postMessage('set-enable-translation', val);
         }
 
+        function addNewWord() {
+            const value = newWordInput.value.trim();
+            if (!value) {
+                alert('Please enter a word in format: key;value');
+                return;
+            }
+            const parts = value.split(';');
+            if (parts.length !== 2) {
+                alert('Invalid format. Please use: key;value');
+                return;
+            }
+            const key = parts[0].trim();
+            const accentValue = parts[1].trim();
+            if (!key || !accentValue) {
+                alert('Key and value cannot be empty');
+                return;
+            }
+
+            postMessage('add-pitch-accent', { key, value: accentValue });
+            newWordInput.value = '';
+            alert('Word added successfully!');
+        }
+
         Vue.watch(targetLanguage, function (val) {
             postMessage('set-target-lang', val);
         });
@@ -84,11 +108,13 @@ Vue.createApp({
             enableOnThisTab,
             showTranslationOnMouseHover,
             targetLanguage,
+            newWordInput,
 
             setEnableOnAllPage,
             setEnableOnThisSite,
             setEnableOnThisTab,
             setShowTranslationOnMouseHover,
+            addNewWord,
         };
     }
 }).mount('#app');

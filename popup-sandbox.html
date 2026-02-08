@@ -1,4 +1,5 @@
 <html>
+
 <head>
     <title></title>
     <script type="text/javascript" src="vue/vue.global.prod.js"></script>
@@ -13,6 +14,28 @@
                 <a href="https://ko-fi.com/x6udpngx" target="_blank" title="Support Me">
                     <img src="./ko-fi.png" alt="">
                 </a>
+            </div>
+
+            <hr>
+
+            <div class="container rows">
+                <div class="form-item">
+                    <div>Add new word</div>
+                </div>
+
+                <div class="sep"></div>
+
+                <div class="form-item">
+                    <input type="text"
+                           v-model="newWordInput"
+                           placeholder="key;value"
+                           @keyup.enter="addNewWord"
+                           style="flex: 1; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; min-width: 0;">
+                    <button @click="addNewWord"
+                            style="margin-left: 8px; padding: 6px 12px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">
+                        Add
+                    </button>
+                </div>
             </div>
 
             <hr>
@@ -96,7 +119,8 @@
     </script>
 
     <style>
-        html, body {
+        html,
+        body {
             margin: 0;
             padding: 0;
             font-size: 14px;
@@ -202,8 +226,10 @@
         }
     </style>
 </head>
+
 <body>
-<div id="app"></div>
-<script type="text/javascript" src="popup-sandbox.js"></script>
+    <div id="app"></div>
+    <script type="text/javascript" src="popup-sandbox.js"></script>
 </body>
+
 </html>

@@ -2,6 +2,7 @@
     'use strict';
 
     let enableInsertRomaji = true;
+    let pitchAccentCache = {};
 
     const excludeTags = new Set(['ruby', 'rt', 'script', 'select', 'option', 'textarea']);
 
@@ -48,7 +49,7 @@
     // ============== kuromoji ==============
     const tokenizerPromise = new Promise(function (resolve, reject) {
         kuromoji
-            .builder({dicPath: chrome.runtime.getURL("kuromoji/dict/")})
+            .builder({ dicPath: chrome.runtime.getURL("kuromoji/dict/") })
             .build(function (err, tokenizer) {
                 if (tokenizer) {
                     resolve(tokenizer);
@@ -64,12 +65,19 @@
         const configs = await new Promise(function (resolve) {
             chrome.storage.sync.get(resolve);
         });
+
+        // Load pitch accent cache
+        const storageData = await new Promise(function (resolve) {
+            chrome.storage.local.get('pitchAccentCache', resolve);
+        });
+        pitchAccentCache = storageData.pitchAccentCache || {};
+
         const globalDisabled = configs['globalDisabled'] || false;
         const disabledDomains = configs['disabledDomains'] || [];
         tokenizer = await tokenizerPromise;
         enableInsertRomaji = !(globalDisabled || disabledDomains.includes(location.host));
-        chrome.runtime.sendMessage({type: 'current-tab-state-change', content: enableInsertRomaji});
-        observer.observe(document, {childList: true, subtree: true});
+        chrome.runtime.sendMessage({ type: 'current-tab-state-change', content: enableInsertRomaji });
+        observer.observe(document, { childList: true, subtree: true });
         if (enableInsertRomaji) {
             scanDocument();
         }
@@ -85,7 +93,7 @@
             case 'set-enabled': {
                 if (enableInsertRomaji !== message.content) {
                     enableInsertRomaji = message.content;
-                    chrome.runtime.sendMessage({type: 'current-tab-state-change', content: enableInsertRomaji});
+                    chrome.runtime.sendMessage({ type: 'current-tab-state-change', content: enableInsertRomaji });
                     if (enableInsertRomaji) {
                         scanDocument();
                     } else {
@@ -217,7 +225,7 @@
                 dom.classList.add('chrome-ext-furigana');
                 dom.appendChild(document.createTextNode(token.surface_form));
                 const rt = document.createElement('rt');
-                rt.textContent = japanese.romanize(
+                rt.textContent = pitchAccentCache[token.surface_form] || japanese.romanize(
                     includesKana(token.pronunciation) ? token.pronunciation : token.surface_form
                 );
                 dom.appendChild(rt);
@@ -245,7 +253,7 @@
         }
         return googleTranslateCache[hash] = new Promise(function (resolve) {
             const url = `https://clients5.google.com/translate_a/single?dj=1&dt=t&dt=sp&dt=ld&dt=bd&client=dict-chrome-ex&sl=${sLang}&tl=${tLang}&q=${encodeURIComponent(text)}`;
-            chrome.runtime.sendMessage({type: 'fetch-json', content: url}, function (json) {
+            chrome.runtime.sendMessage({ type: 'fetch-json', content: url }, function (json) {
                 resolve(json);
             });
         });

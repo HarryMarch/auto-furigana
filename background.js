@@ -25,3 +25,48 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             return true;
     }
 });
+
+// Load pitch accent cache from file
+function loadPitchAccentCache() {
+    fetch(chrome.runtime.getURL('data/pitch_accent.txt'))
+        .then(res => res.text())
+        .then(text => {
+            const cache = {};
+            const lines = text.split('\n');
+            
+            lines.forEach(line => {
+                line = line.trim();
+                if (line) {
+                    const [word, accent] = line.split(';');
+                    if (word && accent) {
+                        cache[word] = accent;
+                    }
+                }
+            });
+            
+            chrome.storage.local.set({ pitchAccentCache: cache }, () => {
+                console.log(`Loaded ${Object.keys(cache).length} pitch accent entries into cache`);
+            });
+        })
+        .catch(err => console.error('Failed to load pitch accent cache:', err));
+}
+
+// Run once on extension install
+chrome.runtime.onInstalled.addListener(function (details) {
+    if (details.reason === 'install') {
+        // Perform one-time setup here
+        console.log('Extension installed. Performing initial setup...');
+        
+        // Load pitch accent data into cache
+        loadPitchAccentCache();
+        
+        // Set default values in storage
+        chrome.storage.local.set({
+            extensionInstalled: true,
+            installDate: new Date().toISOString()
+        });
+        
+        // Example: Open welcome/options page (uncomment to use)
+        // chrome.tabs.create({url: 'popup.html'});
+    }
+});

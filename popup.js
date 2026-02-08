@@ -73,6 +73,17 @@
                 await chrome.storage.sync.set({targetLang: message.content});
             }
                 break;
+            case 'add-pitch-accent': {
+                const { key, value } = message.content;
+                chrome.storage.local.get('pitchAccentCache', function (result) {
+                    let cache = result.pitchAccentCache || {};
+                    cache[key] = value;
+                    chrome.storage.local.set({ pitchAccentCache: cache }, function () {
+                        console.log('Added to pitch accent cache:', key, '=', value);
+                    });
+                });
+            }
+                break;
         }
     });
 
