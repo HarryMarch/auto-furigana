@@ -301,18 +301,18 @@
             }
             const text = textNode.data || '';
             const res = await googleTranslate('ja', configs['targetLang'] || 'en', text);
+            let kanjiInfo = '';
+            text.split('').forEach(char => {
+                if (kanjiCache[char]) {
+                    kanjiInfo += char + ': ' + kanjiCache[char] + '<br>';
+                }
+            });
             if (res.dict?.length) {
-                let kanjiInfo = '';
-                text.split('').forEach(char => {
-                    if (kanjiCache[char]) {
-                        kanjiInfo += char + ': ' + kanjiCache[char] + '<br>';
-                    }
-                });
                 translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + text.split().join('<br>') + '<br>' + res.dict.map(item =>
                     item.pos + ' ' + item.entry.map(item => item.word).join(', ')
                 ).join('<br>');
             } else if (res.sentences?.length) {
-                translationDom.innerHTML = res.sentences.map(item => item.trans).join(', `');
+                translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + res.sentences.map(item => item.trans).join(', `');
             } else {
                 return;
             }

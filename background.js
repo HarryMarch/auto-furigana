@@ -28,22 +28,29 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
 
 // Load pitch accent cache from file
 function loadPitchAccentCache() {
-    fetch(chrome.runtime.getURL('data/pitch_accent.txt'))
-        .then(res => res.text())
-        .then(text => {
-            const cache = {};
-            const lines = text.split('\n');
-            
-            lines.forEach(line => {
-                line = line.trim();
-                if (line) {
-                    const [word, accent] = line.split(';');
-                    if (word && accent) {
-                        cache[word] = accent;
+    const cache = {};
+
+    const loadFile = (relativePath) =>
+        fetch(chrome.runtime.getURL(relativePath))
+            .then(res => res.text())
+            .then(text => {
+                const lines = text.split('\n');
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (line) {
+                        const [word, accent] = line.split(';');
+                        if (word && accent) {
+                            cache[word] = accent;
+                        }
                     }
-                }
+                });
             });
-            
+
+    Promise.all([
+        loadFile('data/pitch_accent.txt'),
+        loadFile('data/pitch_accent_additional.txt')
+    ])
+        .then(() => {
             chrome.storage.local.set({ pitchAccentCache: cache }, () => {
                 console.log(`Loaded ${Object.keys(cache).length} pitch accent entries into cache`);
             });
