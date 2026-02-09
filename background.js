@@ -53,19 +53,19 @@ function loadPitchAccentCache() {
 
 // Run once on extension install
 chrome.runtime.onInstalled.addListener(function (details) {
+    console.log('onInstalled details:', details);
     if (details.reason === 'install') {
-        // Perform one-time setup here
         console.log('Extension installed. Performing initial setup...');
-        
+
         // Load pitch accent data into cache
         loadPitchAccentCache();
-        
+
         // Set default values in storage
         chrome.storage.local.set({
             extensionInstalled: true,
             installDate: new Date().toISOString()
         });
-        
+
         // Example: Open welcome/options page (uncomment to use)
         // chrome.tabs.create({url: 'popup.html'});
     }

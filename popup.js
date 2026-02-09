@@ -87,7 +87,29 @@
             case 'export-pitch-accent-additional': {
                 chrome.storage.local.get('pitchAccentCacheAdditional', function (result) {
                     const cache = result.pitchAccentCacheAdditional || {};
-                    postMessage('export-pitch-accent-additional-result', cache);
+                    const entryCount = Object.keys(cache).length;
+                    if (entryCount === 0) {
+                        postMessage('export-pitch-accent-additional-result', cache);
+                        return;
+                    }
+                    const lines = Object.keys(cache).map(k => `${k};${cache[k]}`).join('\n');
+                    const blob = new Blob([lines], { type: 'text/plain;charset=utf-8' });
+                    try {
+                        const objUrl = URL.createObjectURL(blob);
+                        if (chrome && chrome.downloads && typeof chrome.downloads.download === 'function') {
+                            chrome.downloads.download({ url: objUrl, filename: 'pitch_accent_additional.txt' }, function (downloadId) {
+                                setTimeout(() => URL.revokeObjectURL(objUrl), 1000);
+                                // Inform sandbox the host handled the download
+                                postMessage('export-pitch-accent-additional-result', { downloadedByHost: true, entryCount });
+                            });
+                        } else {
+                            // If downloads API isn't available here (unlikely), fall back to sending cache
+                            postMessage('export-pitch-accent-additional-result', cache);
+                        }
+                    } catch (err) {
+                        console.error('Download failed in popup, falling back to sandbox:', err);
+                        postMessage('export-pitch-accent-additional-result', cache);
+                    }
                 });
             }
                 break;

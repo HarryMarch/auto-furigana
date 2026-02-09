@@ -107,7 +107,14 @@ Vue.createApp({
             if (!message) return;
             if (message.type === 'export-pitch-accent-additional-result') {
                 try {
-                    const cache = message.content || {};
+                    const content = message.content || {};
+                    // If the host (popup) handled the download, just show success
+                    if (content && content.downloadedByHost) {
+                        alert(`Exported ${content.entryCount || 0} entries to pitch_accent_additional.txt`);
+                        return;
+                    }
+
+                    const cache = content || {};
                     const entryCount = Object.keys(cache).length;
                     if (entryCount === 0) {
                         alert('No additional pitch accent data to export.');
@@ -115,20 +122,27 @@ Vue.createApp({
                     }
                     const lines = Object.keys(cache).map(k => `${k};${cache[k]}`).join('\n');
                     const blob = new Blob([lines], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
+                    const objUrl = URL.createObjectURL(blob);
+
+                    // Anchor fallback for environments without downloads API
                     const a = document.createElement('a');
-                    a.href = url;
+                    a.href = objUrl;
                     a.download = 'pitch_accent_additional.txt';
                     a.style.display = 'none';
                     document.body.appendChild(a);
-                    // Trigger download with delay for macOS compatibility
                     setTimeout(() => {
-                        a.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                        try {
+                            a.target = '_blank';
+                            a.rel = 'noopener';
+                            a.click();
+                        } catch (err) {
+                            a.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                        }
                         setTimeout(() => {
                             document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
+                            URL.revokeObjectURL(objUrl);
                             alert(`Successfully exported ${entryCount} entries to pitch_accent_additional.txt`);
-                        }, 100);
+                        }, 300);
                     }, 100);
                 } catch (err) {
                     alert(`Error exporting pitch accent data: ${err.message}`);

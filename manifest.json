@@ -18,7 +18,7 @@
    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsra9xTi5UhDFf765FGA+LMXyi1mflDqIADcwFTB65YsZEOEMTdG8QuL9K5IUifYPwPfZ59z/WLOmnkRHjgHli+3pSZpqCHh8S9txWbOU30Q5sazDWFA+nfrRmWZBfEipQj/0g3Gv2n2/y2ECG3LKIfuslPvChzn1GJw9smK/RkJhvZ80rq3ZtJkuQgtFC/CYieJMK1zzBu/F7Kw3V/YD/XBF5ta5V/aPDrWboxlD/xy1hHvo5x+kROifBDf4GsVG2CQ9mERPEUs5PhPgA0zGVhkh11MKuLQnAVQIkAA17x43Hc4SakjSBMX/7/TieFmU9LKvfRcZ3wZO0adtZeGRpwIDAQAB",
    "manifest_version": 3,
    "name": "Auto Furigana",
-   "permissions": [ "tabs", "storage" ],
+   "permissions": [ "tabs", "storage", "downloads" ],
    "sandbox": {
       "pages": [ "popup-sandbox.html" ]
    },
