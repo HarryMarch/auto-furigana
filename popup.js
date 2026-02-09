@@ -84,7 +84,18 @@
                 });
             }
                 break;
-            case 'export-pitch-accent-additional': {
+            case 'add-kanji': {
+                const { key, value } = message.content;
+                chrome.storage.local.get('kanjiCacheAdditional', function (result) {
+                    let cache = result.kanjiCacheAdditional || {};
+                    cache[key] = value;
+                    chrome.storage.local.set({ kanjiCacheAdditional: cache }, function () {
+                        console.log('Added to kanji cache:', key, '=', value);
+                    });
+                });
+            }
+                break;
+            case 'export-cache-additional': {
                 chrome.storage.local.get('pitchAccentCacheAdditional', function (result) {
                     const cache = result.pitchAccentCacheAdditional || {};
                     const entryCount = Object.keys(cache).length;
@@ -109,6 +120,32 @@
                     } catch (err) {
                         console.error('Download failed in popup, falling back to sandbox:', err);
                         postMessage('export-pitch-accent-additional-result', cache);
+                    }
+                });
+                chrome.storage.local.get('kanjiCacheAdditional', function (result) {
+                    const cache = result.kanjiCacheAdditional || {};
+                    const entryCount = Object.keys(cache).length;
+                    if (entryCount === 0) {
+                        postMessage('export-kanji-additional-result', cache);
+                        return;
+                    }
+                    const lines = Object.keys(cache).map(k => `${k};${cache[k]}`).join('\n');
+                    const blob = new Blob([lines], { type: 'text/plain;charset=utf-8' });
+                    try {
+                        const objUrl = URL.createObjectURL(blob);
+                        if (chrome && chrome.downloads && typeof chrome.downloads.download === 'function') {
+                            chrome.downloads.download({ url: objUrl, filename: 'kanji_additional.txt' }, function (downloadId) {
+                                setTimeout(() => URL.revokeObjectURL(objUrl), 1000);
+                                // Inform sandbox the host handled the download
+                                postMessage('export-kanji-additional-result', { downloadedByHost: true, entryCount });
+                            });
+                        } else {
+                            // If downloads API isn't available here (unlikely), fall back to sending cache
+                            postMessage('export-kanji-additional-result', cache);
+                        }
+                    } catch (err) {
+                        console.error('Download failed in popup, falling back to sandbox:', err);
+                        postMessage('export-kanji-additional-result', cache);
                     }
                 });
             }

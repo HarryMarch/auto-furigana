@@ -51,6 +51,31 @@ function loadPitchAccentCache() {
         .catch(err => console.error('Failed to load pitch accent cache:', err));
 }
 
+// Load kanji cache from file
+function loadKanjiCache() {
+    fetch(chrome.runtime.getURL('data/kanji.txt'))
+        .then(res => res.text())
+        .then(text => {
+            const cache = {};
+            const lines = text.split('\n');
+            
+            lines.forEach(line => {
+                line = line.trim();
+                if (line) {
+                    const [kanji, meaning] = line.split(';');
+                    if (kanji && meaning) {
+                        cache[kanji] = meaning;
+                    }
+                }
+            });
+            
+            chrome.storage.local.set({ kanjiCache: cache }, () => {
+                console.log(`Loaded ${Object.keys(cache).length} kanji entries into cache`);
+            });
+        })
+        .catch(err => console.error('Failed to load kanji cache:', err));
+}
+
 // Run once on extension install
 chrome.runtime.onInstalled.addListener(function (details) {
     console.log('onInstalled details:', details);
@@ -59,6 +84,9 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
         // Load pitch accent data into cache
         loadPitchAccentCache();
+
+        // Load kanji data into cache
+        loadKanjiCache();
 
         // Set default values in storage
         chrome.storage.local.set({

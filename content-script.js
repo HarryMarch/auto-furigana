@@ -3,6 +3,7 @@
 
     let enableInsertRomaji = true;
     let pitchAccentCache = {};
+    let kanjiCache = {};
 
     const excludeTags = new Set(['ruby', 'rt', 'script', 'select', 'option', 'textarea']);
 
@@ -68,9 +69,10 @@
 
         // Load pitch accent cache (merge additional cache if present)
         const storageData = await new Promise(function (resolve) {
-            chrome.storage.local.get(['pitchAccentCache', 'pitchAccentCacheAdditional'], resolve);
+            chrome.storage.local.get(['pitchAccentCache', 'pitchAccentCacheAdditional', 'kanjiCache', 'kanjiCacheAdditional'], resolve);
         });
         pitchAccentCache = Object.assign({}, storageData.pitchAccentCache || {}, storageData.pitchAccentCacheAdditional || {});
+        kanjiCache = Object.assign({}, storageData.kanjiCache || {}, storageData.kanjiCacheAdditional || {});
 
         const globalDisabled = configs['globalDisabled'] || false;
         const disabledDomains = configs['disabledDomains'] || [];
@@ -300,7 +302,13 @@
             const text = textNode.data || '';
             const res = await googleTranslate('ja', configs['targetLang'] || 'en', text);
             if (res.dict?.length) {
-                translationDom.innerHTML = res.dict.map(item =>
+                let kanjiInfo = '';
+                text.split('').forEach(char => {
+                    if (kanjiCache[char]) {
+                        kanjiInfo += char + ': ' + kanjiCache[char] + '<br>';
+                    }
+                });
+                translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + text.split().join('<br>') + '<br>' + res.dict.map(item =>
                     item.pos + ' ' + item.entry.map(item => item.word).join(', ')
                 ).join('<br>');
             } else if (res.sentences?.length) {

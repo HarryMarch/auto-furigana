@@ -26,6 +26,6 @@
    "version": "1.0",
    "web_accessible_resources": [ {
       "matches": [ "\u003Call_urls>" ],
-      "resources": [ "/kuromoji/dict/*", "/data/pitch_accent.txt" ]
+      "resources": [ "/kuromoji/dict/*", "/data/pitch_accent.txt", "/data/kanji.txt" ]
    } ]
 }
