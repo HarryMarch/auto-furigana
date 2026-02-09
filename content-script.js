@@ -66,11 +66,11 @@
             chrome.storage.sync.get(resolve);
         });
 
-        // Load pitch accent cache
+        // Load pitch accent cache (merge additional cache if present)
         const storageData = await new Promise(function (resolve) {
-            chrome.storage.local.get('pitchAccentCache', resolve);
+            chrome.storage.local.get(['pitchAccentCache', 'pitchAccentCacheAdditional'], resolve);
         });
-        pitchAccentCache = storageData.pitchAccentCache || {};
+        pitchAccentCache = Object.assign({}, storageData.pitchAccentCache || {}, storageData.pitchAccentCacheAdditional || {});
 
         const globalDisabled = configs['globalDisabled'] || false;
         const disabledDomains = configs['disabledDomains'] || [];

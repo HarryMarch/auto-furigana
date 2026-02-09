@@ -2,7 +2,7 @@
     function postMessage(type, content) {
         /** @type {HTMLIFrameElement} */
         const sandboxIframe = document.getElementById('sandbox');
-        sandboxIframe.contentWindow.postMessage({type, content}, "*");
+        sandboxIframe.contentWindow.postMessage({ type, content }, "*");
     }
 
     window.addEventListener('message', async function (e) {
@@ -12,7 +12,7 @@
         }
         switch (message.type) {
             case 'init': {
-                const tabs = await chrome.tabs.query({active: true});
+                const tabs = await chrome.tabs.query({ active: true });
                 const activeTab = tabs[0];
                 const domain = new URL(activeTab.url).host;
                 postMessage('domain', domain);
@@ -21,7 +21,7 @@
                     const disabledDomains = items['disabledDomains'] || [];
                     const translationDisabled = items['translationDisabled'] || false;
                     const targetLang = items['targetLang'] || 'en';
-                    chrome.tabs.sendMessage(activeTab.id, {type: 'is-enabled-on-tab'}, function (val) {
+                    chrome.tabs.sendMessage(activeTab.id, { type: 'is-enabled-on-tab' }, function (val) {
                         postMessage('state', {
                             globalDisabled,
                             disabledDomains,
@@ -35,7 +35,7 @@
                 break;
             case 'set-global-disabled': {
                 const disabled = message.content;
-                await chrome.storage.sync.set({globalDisabled: disabled});
+                await chrome.storage.sync.set({ globalDisabled: disabled });
             }
                 break;
             case 'enable-on-domain': {
@@ -43,7 +43,7 @@
                 chrome.storage.sync.get(async function (items) {
                     let disabledDomains = items['disabledDomains'] || [];
                     disabledDomains = disabledDomains.filter(item => item !== domain);
-                    await chrome.storage.sync.set({disabledDomains});
+                    await chrome.storage.sync.set({ disabledDomains });
                 });
             }
                 break;
@@ -52,7 +52,7 @@
                 chrome.storage.sync.get(async function (items) {
                     let disabledDomains = items['disabledDomains'] || [];
                     disabledDomains.push(domain);
-                    await chrome.storage.sync.set({disabledDomains});
+                    await chrome.storage.sync.set({ disabledDomains });
                 });
             }
                 break;
@@ -66,21 +66,28 @@
                 break;
             case 'set-enable-translation': {
                 const enable = message.content;
-                await chrome.storage.sync.set({translationDisabled: !enable});
+                await chrome.storage.sync.set({ translationDisabled: !enable });
             }
                 break;
             case 'set-target-lang': {
-                await chrome.storage.sync.set({targetLang: message.content});
+                await chrome.storage.sync.set({ targetLang: message.content });
             }
                 break;
             case 'add-pitch-accent': {
                 const { key, value } = message.content;
-                chrome.storage.local.get('pitchAccentCache', function (result) {
-                    let cache = result.pitchAccentCache || {};
+                chrome.storage.local.get('pitchAccentCacheAdditional', function (result) {
+                    let cache = result.pitchAccentCacheAdditional || {};
                     cache[key] = value;
-                    chrome.storage.local.set({ pitchAccentCache: cache }, function () {
+                    chrome.storage.local.set({ pitchAccentCacheAdditional: cache }, function () {
                         console.log('Added to pitch accent cache:', key, '=', value);
                     });
+                });
+            }
+                break;
+            case 'export-pitch-accent-additional': {
+                chrome.storage.local.get('pitchAccentCacheAdditional', function (result) {
+                    const cache = result.pitchAccentCacheAdditional || {};
+                    postMessage('export-pitch-accent-additional-result', cache);
                 });
             }
                 break;
@@ -88,11 +95,11 @@
     });
 
     async function setCurrentTabEnable(enable) {
-        const tabs = await chrome.tabs.query({active: true});
+        const tabs = await chrome.tabs.query({ active: true });
         const activeTab = tabs[0];
         chrome.tabs.sendMessage(
             activeTab.id,
-            {type: 'set-enabled', content: enable}
+            { type: 'set-enabled', content: enable }
         );
     }
 })();

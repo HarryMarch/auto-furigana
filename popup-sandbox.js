@@ -12,7 +12,7 @@ Vue.createApp({
         // ==========================================
 
         function postMessage(type, content) {
-            window.parent.postMessage({type, content}, "*");
+            window.parent.postMessage({ type, content }, "*");
         }
 
         window.addEventListener('message', function (e) {
@@ -97,6 +97,46 @@ Vue.createApp({
             alert('Word added successfully!');
         }
 
+        function exportAdditional() {
+            postMessage('export-pitch-accent-additional');
+        }
+
+        // Handle exported data from parent
+        window.addEventListener('message', function (e) {
+            const message = e.data;
+            if (!message) return;
+            if (message.type === 'export-pitch-accent-additional-result') {
+                try {
+                    const cache = message.content || {};
+                    const entryCount = Object.keys(cache).length;
+                    if (entryCount === 0) {
+                        alert('No additional pitch accent data to export.');
+                        return;
+                    }
+                    const lines = Object.keys(cache).map(k => `${k};${cache[k]}`).join('\n');
+                    const blob = new Blob([lines], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'pitch_accent_additional.txt';
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    // Trigger download with delay for macOS compatibility
+                    setTimeout(() => {
+                        a.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                            alert(`Successfully exported ${entryCount} entries to pitch_accent_additional.txt`);
+                        }, 100);
+                    }, 100);
+                } catch (err) {
+                    alert(`Error exporting pitch accent data: ${err.message}`);
+                    console.error('Export error:', err);
+                }
+            }
+        });
+
         Vue.watch(targetLanguage, function (val) {
             postMessage('set-target-lang', val);
         });
@@ -115,6 +155,7 @@ Vue.createApp({
             setEnableOnThisTab,
             setShowTranslationOnMouseHover,
             addNewWord,
+            exportAdditional,
         };
     }
 }).mount('#app');
