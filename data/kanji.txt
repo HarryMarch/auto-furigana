@@ -6,7 +6,9 @@
 候;người (亻) xưa đi săn cầm theo mũi tên (矢) nhưng khi nào cũng phụ thuộc khí HẬU
 促;người (亻) co chân chạy gấp gáp vì bị thúc giục XÚC tiến
 捉;Bắt được thì còng tay (扌) chân (足) lại
-催;một người (亻) THÔI thúc lên núi (山) bắt con chim (隹)
+催;người (亻) THÔI thúc lên núi (山) bắt con chim (隹)
+偏;亻 + 扁 = 偏 THIÊN (vị)
+編;糸 + 扁 = 編 BIÊN (tập) - đan (nón, tóc, bao tay, ...) a.mu
 俯;người (亻) muốn được làm trong PHỦ (府) thì phải biết Cúi Đầu
 嬌;女 Người con gái nét thanh cao - quyến rũ là nàng KIỀU
 橋;木 cầu KIỀU được làm bằng CÂY có độ dài CAO đến TRỜI
@@ -71,7 +73,7 @@
 痺;bị bệnh bạch cầu đã 4 năm, nằm Tê Liệt 1 chỗ
 卑;vì 4 cái ruộng mà TI Hèn Bần Tiện
 福;ruộng ở THỊ (礻) xã là hạnh PHÚC rồi
-裸;kết quả của việc thoát y là Khỏa Thân
+裸;kết QUẢ (果) của việc thoát Y (衤) là Khỏa Thân はだか
 紛;sợi chỉ (糸) làm mình PHÂN tâm
 縮;ở trong Nhà trọ 100 người đang Co Lại như gia SÚC (ちぢ.む Chị Di co người lại)
 縁;sợi dây kéo con nhím và con lợn thành mối lương DUYÊN
@@ -79,6 +81,7 @@
 紅;sợi dây công lý màu HỒNG hay đỏ
 縄;sợi chỉ mà dài hơn 2 thửa ruộng thì nó là Dây Thừng
 縛;sợi chỉ CHUYÊN dùng để Buộc
+博;BÁC 博 học nắm 10 CHUYÊN môn
 緯;sợi dây (糸) tinh VI (韋) nhất là VĨ 緯 tuyến
 艶;màu SẮC (色) PHONG (豊) phú => vẻ đẹp DIỄM lệ
 貫;NHẤT QUÁN (一貫) vô TÂM (忄) - xuyên qua, xuyên suốt
@@ -119,11 +122,13 @@
 悟;孫悟空 - Songoku trong DragonBall
 悩;suốt ngày để TÂM đến 3 cọng tóc (⺍) trên đầu thật phiền NÃO
 恍;HOẢNG<br>恍惚「HOẢNG HỐT」: 感情や状態が非常に幸福で満足している様子を表す言葉です。
-鮮;cá và dê lúc nào cũng phải ăn Tươi mới ngon
+頻;TẦN 頻 ヒン suất người đi bộ đếm bằng đầu ngón tay
+鮮;cá và dê lúc nào cũng phải ăn Tươi あざ.やか mới ngon
 惑;MỒM Nói QUA loa 1 vài câu mà TÂM như Mê HOẶC
 蔑;giấc mơ (夢) thành công (成) bị MIỆT thị
 妖;nữ (女) YÊU quái Đáng Nghi
 扉;戸 + 非 = とびら (Cánh Cửa - PHI)
+房;PHÒNG ボウ Cái buồng. Ngăn, buồng.
 既;KHÁI niệm (概) mà bỏ cây đi (既) thì Chuyện Đã Rồi すで.に
 爽;to 大 gấp 4 lần xxxx4 nên thấy Sảng Khoái, Dễ Chịu
 登;<br>登る (のぼる/noboru): 山や階段を上る（登山、登頂）<br>昇進・上昇: 地位や数値が上がる（登用、登級）<br>登録・記載: リストや名簿に載せる（登録、登記）<br>登場: 舞台や場面に出る
@@ -148,3 +153,4 @@
 哀;lúc nào cũng phải suy nghĩ đến miệng ăn, áo mặc thật là bi AI
 均;bình QUÂN mỗi nhà hai bao đất
 崩;mất 2 tháng để Phá núi tạo thành đường BĂNG 崩
+族;PHƯƠNG pháp nằm bắn tên là của gia TỘC
