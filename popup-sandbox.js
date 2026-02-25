@@ -9,6 +9,47 @@ Vue.createApp({
         const targetLanguage = Vue.ref('en');
         const newWordInput = Vue.ref('');
         const newKanjiInput = Vue.ref('');
+        const showFlashcards = Vue.ref(false);
+        const flashcardType = Vue.ref('kanji');
+        const flashcards = Vue.ref([]);
+        const currentCardIndex = Vue.ref(0);
+        const isFlipped = Vue.ref(false);
+
+        // ==========================================
+
+        const currentCard = Vue.computed(() => {
+            if (flashcards.value.length === 0) {
+                return { front: '', back: '' };
+            }
+            return flashcards.value[currentCardIndex.value];
+        });
+
+        // ==========================================
+
+        function handleKeydown(e) {
+            if (!showFlashcards.value || flashcards.value.length === 0) {
+                return;
+            }
+            
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousCard();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                nextCard();
+            } else if (e.key === ' ') {
+                e.preventDefault();
+                flipCard();
+            }
+        }
+
+        Vue.onMounted(() => {
+            window.addEventListener('keydown', handleKeydown);
+        });
+
+        Vue.onUnmounted(() => {
+            window.removeEventListener('keydown', handleKeydown);
+        });
 
         // ==========================================
 
@@ -39,6 +80,13 @@ Vue.createApp({
                     enableOnThisTab.value = currentTabEnabled;
                     showTranslationOnMouseHover.value = !translationDisabled;
                     targetLanguage.value = targetLang;
+                }
+                    break;
+                case 'flashcard-data': {
+                    const data = message.content;
+                    flashcards.value = data;
+                    currentCardIndex.value = 0;
+                    isFlipped.value = false;
                 }
             }
         });
@@ -123,6 +171,46 @@ Vue.createApp({
 
         function exportAdditional() {
             postMessage('export-cache-additional');
+        }
+
+        function toggleFlashcards() {
+            showFlashcards.value = !showFlashcards.value;
+            if (showFlashcards.value && flashcards.value.length === 0) {
+                loadFlashcards();
+            }
+        }
+
+        function loadFlashcards() {
+            postMessage('get-flashcard-data', flashcardType.value);
+        }
+
+        function flipCard() {
+            isFlipped.value = !isFlipped.value;
+        }
+
+        function nextCard() {
+            if (currentCardIndex.value < flashcards.value.length - 1) {
+                currentCardIndex.value++;
+                isFlipped.value = false;
+            }
+        }
+
+        function previousCard() {
+            if (currentCardIndex.value > 0) {
+                currentCardIndex.value--;
+                isFlipped.value = false;
+            }
+        }
+
+        function shuffleCards() {
+            const shuffled = [...flashcards.value];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            flashcards.value = shuffled;
+            currentCardIndex.value = 0;
+            isFlipped.value = false;
         }
 
         // Handle exported data from parent
@@ -231,6 +319,12 @@ Vue.createApp({
             targetLanguage,
             newWordInput,
             newKanjiInput,
+            showFlashcards,
+            flashcardType,
+            flashcards,
+            currentCardIndex,
+            isFlipped,
+            currentCard,
 
             setEnableOnAllPage,
             setEnableOnThisSite,
@@ -238,7 +332,13 @@ Vue.createApp({
             setShowTranslationOnMouseHover,
             addNewWord,
             addNewKanji,
-            exportAdditional
+            exportAdditional,
+            toggleFlashcards,
+            loadFlashcards,
+            flipCard,
+            nextCard,
+            previousCard,
+            shuffleCards
         };
     }
 }).mount('#app');

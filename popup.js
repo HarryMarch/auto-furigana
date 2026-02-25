@@ -95,6 +95,29 @@
                 });
             }
                 break;
+            case 'get-flashcard-data': {
+                const type = message.content;
+                if (type === 'kanji') {
+                    chrome.storage.local.get(['kanjiCache', 'kanjiCacheAdditional'], function (result) {
+                        const cache = Object.assign({}, result.kanjiCache || {}, result.kanjiCacheAdditional || {});
+                        const cards = Object.keys(cache).map(key => ({
+                            front: key,
+                            back: cache[key]
+                        }));
+                        postMessage('flashcard-data', cards);
+                    });
+                } else if (type === 'words') {
+                    chrome.storage.local.get(['pitchAccentCache', 'pitchAccentCacheAdditional'], function (result) {
+                        const cache = Object.assign({}, result.pitchAccentCache || {}, result.pitchAccentCacheAdditional || {});
+                        const cards = Object.keys(cache).map(key => ({
+                            front: key,
+                            back: cache[key]
+                        }));
+                        postMessage('flashcard-data', cards);
+                    });
+                }
+            }
+                break;
             case 'export-cache-additional': {
                 chrome.storage.local.get('pitchAccentCacheAdditional', function (result) {
                     const cache = result.pitchAccentCacheAdditional || {};

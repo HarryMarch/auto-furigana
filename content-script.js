@@ -77,7 +77,7 @@
         const globalDisabled = configs['globalDisabled'] || false;
         const disabledDomains = configs['disabledDomains'] || [];
         tokenizer = await tokenizerPromise;
-        enableInsertRomaji = !(globalDisabled || disabledDomains.includes(location.host));
+        enableInsertRomaji = !(globalDisabled || disabledDomains.includes(location.host) || window.location.hostname.includes('github.com'));
         chrome.runtime.sendMessage({ type: 'current-tab-state-change', content: enableInsertRomaji });
         observer.observe(document, { childList: true, subtree: true });
         if (enableInsertRomaji) {
