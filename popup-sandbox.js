@@ -31,26 +31,27 @@ Vue.createApp({
                 return;
             }
 
-            alert(e.key);
-            
             if (e.key === 'ArrowLeft') {
                 e.preventDefault();
+                e.stopPropagation();
                 previousCard();
             } else if (e.key === 'ArrowRight') {
                 e.preventDefault();
+                e.stopPropagation();
                 nextCard();
             } else if (e.key === ' ') {
                 e.preventDefault();
+                e.stopPropagation();
                 flipCard();
             }
         }
 
         Vue.onMounted(() => {
-            window.addEventListener('keydown', handleKeydown);
+            document.addEventListener('keydown', handleKeydown, true);
         });
 
         Vue.onUnmounted(() => {
-            window.removeEventListener('keydown', handleKeydown);
+            document.removeEventListener('keydown', handleKeydown, true);
         });
 
         // ==========================================
@@ -180,6 +181,12 @@ Vue.createApp({
             if (showFlashcards.value && flashcards.value.length === 0) {
                 loadFlashcards();
             }
+            if (showFlashcards.value) {
+                // Ensure body has focus for keyboard events
+                Vue.nextTick(() => {
+                    document.body.focus();
+                });
+            }
         }
 
         function loadFlashcards() {
@@ -188,12 +195,14 @@ Vue.createApp({
 
         function flipCard() {
             isFlipped.value = !isFlipped.value;
+            document.body.focus();
         }
 
         function nextCard() {
             if (currentCardIndex.value < flashcards.value.length - 1) {
                 currentCardIndex.value++;
                 isFlipped.value = false;
+                document.body.focus();
             }
         }
 
@@ -201,6 +210,7 @@ Vue.createApp({
             if (currentCardIndex.value > 0) {
                 currentCardIndex.value--;
                 isFlipped.value = false;
+                document.body.focus();
             }
         }
 
