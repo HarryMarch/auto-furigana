@@ -26,6 +26,41 @@ Vue.createApp({
 
         // ==========================================
 
+        function speakJapanese(text) {
+            if (!text || typeof speechSynthesis === 'undefined') {
+                return;
+            }
+            
+            // Cancel any ongoing speech
+            speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'ja-JP';
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0;
+            
+            // Try to find a Japanese voice
+            const voices = speechSynthesis.getVoices();
+            const japaneseVoice = voices.find(voice => voice.lang.startsWith('ja'));
+            if (japaneseVoice) {
+                utterance.voice = japaneseVoice;
+            }
+            
+            speechSynthesis.speak(utterance);
+        }
+
+        // Watch for card changes and play pronunciation
+        Vue.watch(currentCardIndex, () => {
+            if (showFlashcards.value && flashcards.value.length > 0) {
+                const card = flashcards.value[currentCardIndex.value];
+                if (card && card.front) {
+                    speakJapanese(card.front);
+                }
+            }
+        });
+
+        // ==========================================
+
         function handleKeydown(e) {
             if (!showFlashcards.value || flashcards.value.length === 0) {
                 return;
@@ -48,10 +83,22 @@ Vue.createApp({
 
         Vue.onMounted(() => {
             document.addEventListener('keydown', handleKeydown, true);
+            
+            // Ensure voices are loaded for speech synthesis
+            if (typeof speechSynthesis !== 'undefined') {
+                speechSynthesis.getVoices();
+                speechSynthesis.onvoiceschanged = () => {
+                    speechSynthesis.getVoices();
+                };
+            }
         });
 
         Vue.onUnmounted(() => {
             document.removeEventListener('keydown', handleKeydown, true);
+            // Cancel any ongoing speech
+            if (typeof speechSynthesis !== 'undefined') {
+                speechSynthesis.cancel();
+            }
         });
 
         // ==========================================
@@ -90,6 +137,12 @@ Vue.createApp({
                     flashcards.value = data;
                     currentCardIndex.value = 0;
                     isFlipped.value = false;
+                    // Play pronunciation of first card
+                    if (data.length > 0) {
+                        Vue.nextTick(() => {
+                            speakJapanese(data[0].front);
+                        });
+                    }
                 }
             }
         });
@@ -186,6 +239,11 @@ Vue.createApp({
                 Vue.nextTick(() => {
                     document.body.focus();
                 });
+            } else {
+                // Cancel speech when closing flashcards
+                if (typeof speechSynthesis !== 'undefined') {
+                    speechSynthesis.cancel();
+                }
             }
         }
 
