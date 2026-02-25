@@ -30,6 +30,8 @@ Vue.createApp({
             if (!showFlashcards.value || flashcards.value.length === 0) {
                 return;
             }
+
+            alert(e.key);
             
             if (e.key === 'ArrowLeft') {
                 e.preventDefault();
@@ -341,4 +343,5 @@ Vue.createApp({
             shuffleCards
         };
     }
+
 }).mount('#app');
