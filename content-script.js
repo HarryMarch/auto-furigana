@@ -81,7 +81,7 @@
         chrome.runtime.sendMessage({ type: 'current-tab-state-change', content: enableInsertRomaji });
         observer.observe(document, { childList: true, subtree: true });
         const style = document.createElement('style');
-        style.textContent = 'div.lln-vertical-view-sub.lln-sentence-wrap.lln-with-play-btn.odd.lln-bigger-item-font.in-scroll.active { background-color: yellowgreen !important; } div.bg-df.box-footer.ng-star-inserted { display: none !important; } [class$="--DivCaptionContainer"] { font-size: 15rem !important; }';
+        style.textContent = 'div.lln-vertical-view-sub.lln-sentence-wrap.lln-with-play-btn.odd.lln-bigger-item-font.in-scroll.active { background-color: yellowgreen !important; } div.bg-df.box-footer.ng-star-inserted { display: none !important; } .css-16dqvl7-7937d88b--DivVideoClosedCaption { font-size: 15rem !important; }';
         document.head.appendChild(style);
         if (enableInsertRomaji) {
             scanDocument();
