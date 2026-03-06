@@ -80,6 +80,9 @@
         enableInsertRomaji = !(globalDisabled || disabledDomains.includes(location.host) || window.location.hostname.includes('github.com'));
         chrome.runtime.sendMessage({ type: 'current-tab-state-change', content: enableInsertRomaji });
         observer.observe(document, { childList: true, subtree: true });
+        const style = document.createElement('style');
+        style.textContent = 'div.lln-vertical-view-sub.lln-sentence-wrap.lln-with-play-btn.odd.lln-bigger-item-font.in-scroll.active { background-color: yellowgreen !important; } div.bg-df.box-footer.ng-star-inserted { display: none !important; } [class$="--DivCaptionContainer"] { font-size: 15rem !important; }';
+        document.head.appendChild(style);
         if (enableInsertRomaji) {
             scanDocument();
         }
@@ -167,6 +170,10 @@
         const matchChinese = pageText.match(/[\u3400-\u4DBF\u4E00-\u9FEF\u20000-\u2EBFF]/g);
         const chineseNum = matchChinese ? matchChinese.length : 0;
         isPageChinese = chineseNum && (kanaNum / chineseNum < 0.02);
+    }
+    if (window.location.hostname.includes('youtube.com')) {
+        isPageChinese = false;
+        
     }
 
     // ============== scan document ==============
