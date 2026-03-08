@@ -4491,7 +4491,7 @@ module.exports = function (japanese) {
 								'a': 'ā',
 								'i': 'ī',
 								'u': 'ū',
-								'e': 'ē',
+								'e': 'ē', // chú ý: Trường hợp e + i không phải là ē
 								'o': 'ō'
 							}[dest.slice(-1)];
 						}
