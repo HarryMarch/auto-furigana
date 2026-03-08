@@ -81,8 +81,43 @@
         chrome.runtime.sendMessage({ type: 'current-tab-state-change', content: enableInsertRomaji });
         observer.observe(document, { childList: true, subtree: true });
         const style = document.createElement('style');
-        style.textContent = 'div.lln-vertical-view-sub.lln-sentence-wrap.lln-with-play-btn.odd.lln-bigger-item-font.in-scroll.active { background-color: yellowgreen !important; } div.bg-df.box-footer.ng-star-inserted { display: none !important; } .css-16dqvl7-7937d88b--DivVideoClosedCaption { font-size: 5rem !important; }';
+        style.textContent = `
+            div.lln-vertical-view-sub.lln-sentence-wrap.lln-with-play-btn.odd.lln-bigger-item-font.in-scroll.active {
+                background-color: yellowgreen !important;
+            }
+
+            div.bg-df.box-footer.ng-star-inserted {
+                display: none !important;
+            }
+
+            .css-16dqvl7-7937d88b--DivVideoClosedCaption {
+                font-size: 5rem !important;
+                position: absolute !important;
+                top: 5% !important;
+                left: 15% !important;
+                z-index: 9999 !important;
+            }
+
+            .css-56cod3-7937d88b--DivMediaCardOverlayTop {
+                display: none !important;
+            }
+
+            .css-3rm8q2-7937d88b--DivMediaCardOverlay {
+                flex-direction: row !important;
+            }
+
+            .css-1iectv1-7937d88b--DivMediaCardOverlayBottom {
+                width: 100% !important;
+            }
+        `;
         document.head.appendChild(style);
+        if (window.location.hostname.includes("tiktok.com")) {
+            const url = new URL(window.location.href);
+            if (url.searchParams.get("lang") !== "ja") {
+                url.searchParams.set("lang", "ja");
+                window.location.replace(url.toString()); // reload with ?lang=ja
+            }
+        }
         if (enableInsertRomaji) {
             scanDocument();
         }
@@ -173,7 +208,6 @@
     }
     if (window.location.hostname.includes('youtube.com')) {
         isPageChinese = false;
-        
     }
 
     // ============== scan document ==============
