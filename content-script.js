@@ -93,8 +93,8 @@
             .css-16dqvl7-7937d88b--DivVideoClosedCaption {
                 font-size: 5rem !important;
                 position: absolute !important;
-                top: 1% !important;
-                left: 15% !important;
+                top: 2% !important;
+                left: 5% !important;
                 z-index: 9999 !important;
             }
 
@@ -103,7 +103,7 @@
             }
 
             .css-3rm8q2-7937d88b--DivMediaCardOverlay {
-                flex-direction: row !important;
+                flex-direction: row-reverse !important;
             }
 
             .css-1iectv1-7937d88b--DivMediaCardOverlayBottom {
@@ -117,7 +117,6 @@
                 url.searchParams.set("lang", "ja");
                 window.location.replace(url.toString()); // reload with ?lang=ja
             }
-            document.querySelector("#media-card-0 > div > div.css-3rm8q2-7937d88b--DivMediaCardOverlay.e1ny156f0 > div.css-56cod3-7937d88b--DivMediaCardOverlayTop.e1ny156f1 > div.css-1vfs3fo-7937d88b--DivVolumeControlContainer.ejuncss0 > div > button")?.click(); // click volume button to show captions
         }
         if (enableInsertRomaji) {
             scanDocument();
