@@ -93,7 +93,7 @@
             .css-16dqvl7-7937d88b--DivVideoClosedCaption {
                 font-size: 5rem !important;
                 position: absolute !important;
-                top: 5% !important;
+                top: 3% !important;
                 left: 15% !important;
                 z-index: 9999 !important;
             }
