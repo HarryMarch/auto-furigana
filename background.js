@@ -109,7 +109,7 @@ function showRandomKanjiNotification() {
 function setupRandomKanjiAlarm() {
     chrome.alarms.create(RANDOM_KANJI_ALARM, {
         delayInMinutes: 1,
-        periodInMinutes: 1
+        periodInMinutes: 5
     });
 }
 
