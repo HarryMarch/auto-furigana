@@ -2,6 +2,8 @@ function setIcon(active) {
     chrome.action.setIcon({path: active ? 'icon.png' : 'icon-inactive.png'});
 }
 
+const RANDOM_KANJI_ALARM = 'random-kanji-notification';
+
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     chrome.tabs.sendMessage(
         activeInfo.tabId,
@@ -83,6 +85,58 @@ function loadKanjiCache() {
         .catch(err => console.error('Failed to load kanji cache:', err));
 }
 
+function showRandomKanjiNotification() {
+    chrome.storage.local.get(['kanjiCache'], function (result) {
+        const cache = result.kanjiCache || {};
+        const kanjiList = Object.entries(cache);
+
+        if (kanjiList.length === 0) {
+            return;
+        }
+
+        const randomIndex = Math.floor(Math.random() * kanjiList.length);
+        const [kanji, meaning] = kanjiList[randomIndex];
+
+        chrome.notifications.create({
+            type: 'basic',
+            iconUrl: 'icon.png',
+            title: 'Random Kanji',
+            message: `${kanji}: ${meaning}`
+        });
+    });
+}
+
+function setupRandomKanjiAlarm() {
+    chrome.alarms.create(RANDOM_KANJI_ALARM, {
+        delayInMinutes: 1,
+        periodInMinutes: 1
+    });
+}
+
+function clearAllExtensionNotifications() {
+    chrome.notifications.getAll(function (notifications) {
+        Object.keys(notifications).forEach(function (notificationId) {
+            chrome.notifications.clear(notificationId);
+        });
+    });
+}
+
+function resetRandomKanjiNotifications() {
+    chrome.alarms.clear(RANDOM_KANJI_ALARM, function () {
+        setupRandomKanjiAlarm();
+    });
+}
+
+chrome.alarms.onAlarm.addListener(function (alarm) {
+    if (alarm.name === RANDOM_KANJI_ALARM) {
+        const now = new Date();
+        const hour = now.getHours();
+        if (hour >= 6 && hour < 19) {
+            showRandomKanjiNotification();
+        }
+    }
+});
+
 // Run once on extension install
 chrome.runtime.onInstalled.addListener(function (details) {
     console.log('onInstalled details:', details);
@@ -95,6 +149,10 @@ chrome.runtime.onInstalled.addListener(function (details) {
         // Load kanji data into cache
         loadKanjiCache();
 
+        // Start periodic random kanji notifications
+        clearAllExtensionNotifications();
+        resetRandomKanjiNotifications();
+
         // Set default values in storage
         chrome.storage.local.set({
             extensionInstalled: true,
@@ -103,5 +161,13 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
         // Example: Open welcome/options page (uncomment to use)
         // chrome.tabs.create({url: 'popup.html'});
+    } else if (details.reason === 'update') {
+        clearAllExtensionNotifications();
+        resetRandomKanjiNotifications();
     }
+});
+
+chrome.runtime.onStartup.addListener(function () {
+    clearAllExtensionNotifications();
+    resetRandomKanjiNotifications();
 });

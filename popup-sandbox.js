@@ -14,6 +14,9 @@ Vue.createApp({
         const flashcards = Vue.ref([]);
         const currentCardIndex = Vue.ref(0);
         const isFlipped = Vue.ref(false);
+        const autoNextEnabled = Vue.ref(false);
+        let speakTimeoutId = null;
+        let autoNextTimeoutId = null;
 
         // ==========================================
 
@@ -30,23 +33,31 @@ Vue.createApp({
             if (!text || typeof speechSynthesis === 'undefined') {
                 return;
             }
-            
+
+            if (speakTimeoutId) {
+                clearTimeout(speakTimeoutId);
+                speakTimeoutId = null;
+            }
+
             // Cancel any ongoing speech
             speechSynthesis.cancel();
-            
+
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'ja-JP';
             utterance.rate = 0.9;
             utterance.pitch = 1.0;
-            
+
             // Try to find a Japanese voice
             const voices = speechSynthesis.getVoices();
             const japaneseVoice = voices.find(voice => voice.lang.startsWith('ja'));
             if (japaneseVoice) {
                 utterance.voice = japaneseVoice;
             }
-            
-            speechSynthesis.speak(utterance);
+
+            speakTimeoutId = setTimeout(() => {
+                speechSynthesis.speak(utterance);
+                speakTimeoutId = null;
+            }, 1000);
         }
 
         // Watch for card changes and play pronunciation
@@ -83,7 +94,7 @@ Vue.createApp({
 
         Vue.onMounted(() => {
             document.addEventListener('keydown', handleKeydown, true);
-            
+
             // Ensure voices are loaded for speech synthesis
             if (typeof speechSynthesis !== 'undefined') {
                 speechSynthesis.getVoices();
@@ -95,6 +106,11 @@ Vue.createApp({
 
         Vue.onUnmounted(() => {
             document.removeEventListener('keydown', handleKeydown, true);
+            stopAutoNext();
+            if (speakTimeoutId) {
+                clearTimeout(speakTimeoutId);
+                speakTimeoutId = null;
+            }
             // Cancel any ongoing speech
             if (typeof speechSynthesis !== 'undefined') {
                 speechSynthesis.cancel();
@@ -137,6 +153,9 @@ Vue.createApp({
                     flashcards.value = data;
                     currentCardIndex.value = 0;
                     isFlipped.value = false;
+                    if (data.length === 0) {
+                        stopAutoNext();
+                    }
                     // Play pronunciation of first card
                     if (data.length > 0) {
                         Vue.nextTick(() => {
@@ -240,7 +259,12 @@ Vue.createApp({
                     document.body.focus();
                 });
             } else {
+                stopAutoNext();
                 // Cancel speech when closing flashcards
+                if (speakTimeoutId) {
+                    clearTimeout(speakTimeoutId);
+                    speakTimeoutId = null;
+                }
                 if (typeof speechSynthesis !== 'undefined') {
                     speechSynthesis.cancel();
                 }
@@ -264,6 +288,19 @@ Vue.createApp({
             }
         }
 
+        function nextCardInfinite() {
+            if (flashcards.value.length === 0) {
+                return;
+            }
+            if (currentCardIndex.value < flashcards.value.length - 1) {
+                currentCardIndex.value++;
+            } else {
+                currentCardIndex.value = 0;
+            }
+            isFlipped.value = false;
+            document.body.focus();
+        }
+
         function previousCard() {
             if (currentCardIndex.value > 0) {
                 currentCardIndex.value--;
@@ -281,6 +318,57 @@ Vue.createApp({
             flashcards.value = shuffled;
             currentCardIndex.value = 0;
             isFlipped.value = false;
+        }
+
+        function startAutoNext() {
+            if (autoNextEnabled.value || flashcards.value.length === 0) {
+                return;
+            }
+            autoNextEnabled.value = true;
+
+            function runAutoNextCycle() {
+                if (!autoNextEnabled.value || flashcards.value.length === 0) {
+                    return;
+                }
+
+                isFlipped.value = false;
+                document.body.focus();
+
+                autoNextTimeoutId = setTimeout(() => {
+                    if (!autoNextEnabled.value) {
+                        return;
+                    }
+
+                    isFlipped.value = true;
+
+                    autoNextTimeoutId = setTimeout(() => {
+                        if (!autoNextEnabled.value) {
+                            return;
+                        }
+
+                        nextCardInfinite();
+                        runAutoNextCycle();
+                    }, 3500);
+                }, 2500);
+            }
+
+            runAutoNextCycle();
+        }
+
+        function stopAutoNext() {
+            autoNextEnabled.value = false;
+            if (autoNextTimeoutId) {
+                clearTimeout(autoNextTimeoutId);
+                autoNextTimeoutId = null;
+            }
+        }
+
+        function toggleAutoNext() {
+            if (autoNextEnabled.value) {
+                stopAutoNext();
+            } else {
+                startAutoNext();
+            }
         }
 
         // Handle exported data from parent
@@ -394,6 +482,7 @@ Vue.createApp({
             flashcards,
             currentCardIndex,
             isFlipped,
+            autoNextEnabled,
             currentCard,
 
             setEnableOnAllPage,
@@ -408,7 +497,8 @@ Vue.createApp({
             flipCard,
             nextCard,
             previousCard,
-            shuffleCards
+            shuffleCards,
+            toggleAutoNext
         };
     }
 
