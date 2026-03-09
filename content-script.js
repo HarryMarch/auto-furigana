@@ -113,6 +113,7 @@
             ytd-transcript-segment-renderer.active .segment.ytd-transcript-segment-renderer {
                 background-color: yellowgreen !important;
                 font-size: 25px !important;
+                line-height: 45px !important;
             }
         `;
         document.head.appendChild(style);
