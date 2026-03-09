@@ -99,7 +99,7 @@
             }
 
             .css-56cod3-7937d88b--DivMediaCardOverlayTop {
-                display: none !important;
+                flex-direction: column !important;
             }
 
             .css-3rm8q2-7937d88b--DivMediaCardOverlay {
