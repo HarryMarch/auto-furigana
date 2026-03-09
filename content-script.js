@@ -110,7 +110,7 @@
                 width: 100% !important;
             }
 
-            ytd-transcript-segment-renderer.style-scope.ytd-transcript-segment-list-renderer.active {
+            ytd-transcript-segment-renderer.active .segment.ytd-transcript-segment-renderer {
                 background-color: yellowgreen !important;
             }
         `;
