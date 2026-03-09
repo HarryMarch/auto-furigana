@@ -109,6 +109,10 @@
             .css-1iectv1-7937d88b--DivMediaCardOverlayBottom {
                 width: 100% !important;
             }
+
+            ytd-transcript-segment-renderer.style-scope.ytd-transcript-segment-list-renderer.active {
+                background-color: yellowgreen !important;
+            }
         `;
         document.head.appendChild(style);
         if (window.location.hostname.includes("tiktok.com")) {
