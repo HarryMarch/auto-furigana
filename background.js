@@ -3,6 +3,7 @@ function setIcon(active) {
 }
 
 const RANDOM_KANJI_ALARM = 'random-kanji-notification';
+const notificationLinks = {};
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     chrome.tabs.sendMessage(
@@ -38,7 +39,7 @@ function loadPitchAccentCache() {
             .then(text => {
                 const lines = text.split('\n');
                 lines.forEach(line => {
-                    line = line.trim();
+                    // line = line.trim();
                     if (line) {
                         const [word, accent] = line.split(';');
                         if (word && accent) {
@@ -96,8 +97,10 @@ function showRandomKanjiNotification() {
 
         const randomIndex = Math.floor(Math.random() * kanjiList.length);
         const [kanji, meaning] = kanjiList[randomIndex];
+        const notificationId = `random-kanji-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        notificationLinks[notificationId] = `https://jisho.org/search/*${encodeURIComponent(kanji)}*`;
 
-        chrome.notifications.create({
+        chrome.notifications.create(notificationId, {
             type: 'basic',
             iconUrl: 'icon.png',
             title: 'Random Kanji',
@@ -105,6 +108,19 @@ function showRandomKanjiNotification() {
         });
     });
 }
+
+chrome.notifications.onClicked.addListener(function (notificationId) {
+    const targetUrl = notificationLinks[notificationId];
+    if (targetUrl) {
+        chrome.tabs.create({ url: targetUrl });
+        chrome.notifications.clear(notificationId);
+        delete notificationLinks[notificationId];
+    }
+});
+
+chrome.notifications.onClosed.addListener(function (notificationId) {
+    delete notificationLinks[notificationId];
+});
 
 function setupRandomKanjiAlarm() {
     chrome.alarms.create(RANDOM_KANJI_ALARM, {
