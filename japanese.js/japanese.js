@@ -42,7 +42,13 @@ exports.fromByteArray = fromByteArray
 var lookup = []
 var revLookup = []
 var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
-
+/*
+ā
+ī
+ū
+ē
+ō
+*/
 function init () {
   var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
   for (var i = 0, len = code.length; i < len; ++i) {
