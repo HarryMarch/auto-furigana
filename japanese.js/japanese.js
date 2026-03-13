@@ -48,6 +48,11 @@ var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
 ū
 ē
 ō
+ā
+ī
+ū
+ē
+ō
 */
 function init () {
   var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'

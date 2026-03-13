@@ -115,6 +115,16 @@
                 font-size: 25px !important;
                 line-height: 45px !important;
             }
+
+            .segment.ytd-transcript-segment-renderer {
+                font-size: 20px !important;
+                line-height: 36px !important;
+            }
+
+            .lln-word[data-word-key$=ja] {
+                font-size: 3rem;
+                line-height: 4.5rem;
+            }
         `;
         document.head.appendChild(style);
         if (window.location.hostname.includes("tiktok.com")) {
@@ -200,6 +210,13 @@
         return includesKana(text) || includesKanji(text);
     }
 
+    function addJapaneseTokenToStorage(accent) {
+        chrome.storage.local.get(['japaneseToken'], function (result) {
+            const japaneseToken = typeof result.japaneseToken === 'string' ? result.japaneseToken : '';
+            chrome.storage.local.set({ japaneseToken: japaneseToken + accent + ';' });
+        });
+    }
+
     // ============== check is page chinese ==============
     let isPageChinese = false;
     if (document.documentElement.lang.includes('zh')) {
@@ -274,6 +291,9 @@
                 dom.classList.add('chrome-ext-furigana');
                 dom.appendChild(document.createTextNode(token.surface_form));
                 const rt = document.createElement('rt');
+                if (pitchAccentCache[token.surface_form] && includesJapanese(pitchAccentCache[token.surface_form])) {
+                    addJapaneseTokenToStorage(pitchAccentCache[token.surface_form]);
+                }
                 rt.textContent = pitchAccentCache[token.surface_form] || japanese.romanize(
                     includesKana(token.pronunciation) ? token.pronunciation : token.surface_form
                 );
@@ -373,6 +393,23 @@
 
     document.addEventListener('scroll', function () {
         translationDom.classList.remove('show');
+    });
+
+    // Dispatch a custom event when the '.' key is pressed so other parts
+    // of the extension can react without coupling to this file.
+    document.addEventListener('keydown', function (e) {
+        if (e.key === '.' && !e.repeat) {
+            const evt = new CustomEvent('dotKeyPressed', {
+                detail: {
+                    altKey: e.altKey,
+                    ctrlKey: e.ctrlKey,
+                    metaKey: e.metaKey,
+                    shiftKey: e.shiftKey
+                }
+            });
+            document.dispatchEvent(evt);
+            console.log('Dispatched dotKeyPressed event with modifiers:', evt.detail);
+        }
     });
 
 })();

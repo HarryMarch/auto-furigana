@@ -26,3 +26,32 @@ ruby.chrome-ext-furigana:hover rt {
 .chrome-ext-furigana-translation.show {
     display: inline-block;
 }
+
+/* Make ruby base text invisible but keep furigana visible,
+   but only when the ruby is inside yt-core-attributed-string spans */
+span.yt-core-attributed-string ruby.chrome-ext-furigana {
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
+}
+/* expose the span's computed color via a custom property so rt can use it
+   even when the ruby itself is made transparent */
+.ytwTranscriptSegmentViewModelHost > span.yt-core-attributed-string ruby.chrome-ext-furigana > rt {
+    color: grey !important;
+    -webkit-text-fill-color: grey !important;
+    opacity: 1 !important;
+}
+
+.ytwTranscriptSegmentViewModelHostActive > span.yt-core-attributed-string ruby.chrome-ext-furigana > rt {
+    color: black !important;
+    -webkit-text-fill-color: black !important;
+    opacity: 1 !important;
+}
+
+/* Reveal base ruby text only on hover of the span or the ruby itself */
+span.yt-core-attributed-string:hover ruby.chrome-ext-furigana,
+span.yt-core-attributed-string ruby.chrome-ext-furigana:hover {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+    text-shadow: none !important;
+}
