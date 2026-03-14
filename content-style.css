@@ -1,6 +1,6 @@
 ruby.chrome-ext-furigana rt {
     user-select: none;
-    opacity: .8;
+    opacity: .8 !important;
     font-size: max(50%, 12px);
 }
 
@@ -46,6 +46,15 @@ span.yt-core-attributed-string ruby.chrome-ext-furigana {
     color: black !important;
     -webkit-text-fill-color: black !important;
     opacity: 1 !important;
+}
+
+/* When the dot key is active, let the active transcript node inherit color
+   (overrides the fixed grey/black rules so the higher-level span color applies) */
+.dot-key-active .ytwTranscriptSegmentViewModelHostActive > span.yt-core-attributed-string ruby.chrome-ext-furigana,
+.dot-key-active .ytwTranscriptSegmentViewModelHostActive > span.yt-core-attributed-string ruby.chrome-ext-furigana > rt {
+    color: inherit !important;
+    -webkit-text-fill-color: inherit !important;
+    text-shadow: none !important;
 }
 
 /* Reveal base ruby text only on hover of the span or the ruby itself */
