@@ -1,6 +1,6 @@
 ruby.chrome-ext-furigana rt {
     user-select: none;
-    opacity: .8 !important;
+    opacity: .8;
     font-size: max(50%, 12px);
 }
 

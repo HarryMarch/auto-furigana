@@ -109,10 +109,25 @@ function showRandomKanjiNotification() {
     });
 }
 
+function openUrlFromNotification(targetUrl) {
+    chrome.windows.create({ url: targetUrl, focused: true, type: 'normal' }, function () {
+        if (!chrome.runtime.lastError) {
+            return;
+        }
+
+        console.error('Failed to open new window:', chrome.runtime.lastError.message);
+        chrome.tabs.create({ url: targetUrl }, function () {
+            if (chrome.runtime.lastError) {
+                console.error('Fallback tab open failed:', chrome.runtime.lastError.message);
+            }
+        });
+    });
+}
+
 chrome.notifications.onClicked.addListener(function (notificationId) {
     const targetUrl = notificationLinks[notificationId];
     if (targetUrl) {
-        chrome.tabs.create({ url: targetUrl });
+        openUrlFromNotification(targetUrl);
         chrome.notifications.clear(notificationId);
         delete notificationLinks[notificationId];
     }

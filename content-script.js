@@ -91,11 +91,18 @@
             }
 
             .css-16dqvl7-7937d88b--DivVideoClosedCaption {
-                font-size: 5rem !important;
                 position: absolute !important;
                 top: 2% !important;
                 left: 5% !important;
                 z-index: 9999 !important;
+            }
+
+            .css-16dqvl7-7937d88b--DivVideoClosedCaption > ruby {
+                font-size: 1rem !important;
+            }
+
+            .css-16dqvl7-7937d88b--DivVideoClosedCaption > ruby > rt {
+                font-size: 3rem !important;
             }
 
             .css-56cod3-7937d88b--DivMediaCardOverlayTop {
@@ -397,8 +404,17 @@
 
     // Dispatch a custom event when the '.' key is pressed so other parts
     // of the extension can react without coupling to this file.
-    document.addEventListener('keydown', function (e) {
-        if (e.key === '.' && !e.repeat) {
+    function handleDotKey(e) {
+        // Ignore keys typed into inputs, textareas, or contenteditable elements
+        const target = e.target || e.srcElement;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+            return;
+        }
+        if (e.repeat) {
+            return;
+        }
+        // Some layouts may not produce '.' as e.key; check both key and code
+        if (e.key === '.' || e.code === 'Period') {
             const evt = new CustomEvent('dotKeyPressed', {
                 detail: {
                     altKey: e.altKey,
@@ -408,8 +424,30 @@
                 }
             });
             document.dispatchEvent(evt);
-            console.log('Dispatched dotKeyPressed event with modifiers:', evt.detail);
         }
+    }
+
+    // Normal and capturing listeners: capturing helps catch events on pages
+    // (like YouTube) that register handlers in the bubble phase or stop
+    // propagation on elements.
+    document.addEventListener('keydown', handleDotKey);
+
+    // Add CSS class when dotKeyPressed fires so CSS rules can take effect on the page (e.g., YouTube transcript)
+    document.addEventListener('dotKeyPressed', function (ev) {
+        document.documentElement.classList.add('dot-key-active');
     });
 
+    // Remove the class when the dot key is released so the effect is temporary.
+    function handleDotKeyUp(e) {
+        // Ignore keys coming from form fields or contenteditable areas
+        const target = e.target || e.srcElement;
+        if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+            return;
+        }
+        if (e.key === '.' || e.code === 'Period') {
+            document.documentElement.classList.remove('dot-key-active');
+        }
+    }
+    // Use capturing on window to increase chance of catching keyup on sites that stop propagation
+    document.addEventListener('keyup', handleDotKeyUp);
 })();
