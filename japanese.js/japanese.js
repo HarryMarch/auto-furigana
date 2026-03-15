@@ -44,15 +44,15 @@ var revLookup = []
 var Arr = typeof Uint8Array !== 'undefined' ? Uint8Array : Array
 /*
 ā
+
 ī
+
 ū
+
 ē
+
 ō
-ā
-ī
-ū
-ē
-ō
+
 */
 function init () {
   var code = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'

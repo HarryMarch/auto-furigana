@@ -236,7 +236,7 @@
         const chineseNum = matchChinese ? matchChinese.length : 0;
         isPageChinese = chineseNum && (kanaNum / chineseNum < 0.02);
     }
-    if (window.location.hostname.includes('youtube.com')) {
+    if (window.location.hostname.includes('youtube.com') || window.location.hostname.includes('tiktok.com')) {
         isPageChinese = false;
     }
 
