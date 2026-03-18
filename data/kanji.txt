@@ -16,7 +16,7 @@
 驕;馬 ngựa cao cong = KIÊU căng, ngạo mạn
 蕎;艹 hoa, cỏ cao cong = kiều mạch, soba
 跳;thuê chân (⻊) dài KHIÊU vũ hết cả TRIỆU (兆) bạc (は.ねる Hà nê lết cái chân rồi nhảy múa)
-眺;có TRIỆU (兆) con MẮT (目) nên Tầm Nhìn không THIẾU (眺) sót (なが.める ngắn chân Dài ながい)
+眺;có TRIỆU (兆) con MẮT (目) nên Tầm Nhìn không THIẾU (眺) sót (なが.める ngắm chân Dài ながい)
 逃;ĐÀO tẩu với TRIỆU (兆) đô cướp đc
 巡;đi lại (⻌) dọc bờ sông TUẦN 巡 Tra (めぐ.る Mẹ Gừ Rừ đi tìm mình xung quanh)
 遜;dạy con cháu đi lại (⻌) Khiêm TỐN
@@ -211,3 +211,5 @@
 劣;THIỂU (少) LỰC (力) bị LIỆT 劣 vào hàng Yếu Kém
 史;lịch SỬ 史 của người TRUNG (中)
 驚;mọi người KINH 驚 キョウ ngạc về sự tôn KÍNH (敬) của con ngựa (馬)
+冒;mắt (目) nhìn trực tiếp mặt trời (日) thì MẠO 冒 ボウ Hiểm (MẠO Đầu) quá
+署;học GIẢ (者) nằm VÕNG (罒) Ký Tên THỰ 署 ショ
