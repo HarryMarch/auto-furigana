@@ -39,7 +39,7 @@ function loadPitchAccentCache() {
             .then(text => {
                 const lines = text.split('\n');
                 lines.forEach(line => {
-                    // line = line.trim();
+                    line = line.trim();
                     if (line) {
                         const [word, accent] = line.split(';');
                         if (word && accent) {
@@ -110,13 +110,17 @@ function showRandomKanjiNotification() {
 }
 
 function openUrlFromNotification(targetUrl) {
-    chrome.windows.create({ url: targetUrl, focused: true, type: 'normal' }, function () {
+    // Open a lightweight helper page in the extension that calls navigator.share.
+    // This works on Android browsers (Chrome) to surface the native share sheet.
+    const sharePage = chrome.runtime.getURL('share.html?u=' + encodeURIComponent(targetUrl));
+    chrome.windows.create({ url: sharePage, focused: true, type: 'popup', width: 420, height: 640 }, function () {
         if (!chrome.runtime.lastError) {
             return;
         }
 
-        console.error('Failed to open new window:', chrome.runtime.lastError.message);
-        chrome.tabs.create({ url: targetUrl }, function () {
+        console.error('Failed to open share window:', chrome.runtime.lastError && chrome.runtime.lastError.message);
+        // Fallback: open as a tab
+        chrome.tabs.create({ url: sharePage }, function () {
             if (chrome.runtime.lastError) {
                 console.error('Fallback tab open failed:', chrome.runtime.lastError.message);
             }
