@@ -1,5 +1,5 @@
 function setIcon(active) {
-    chrome.action.setIcon({path: active ? 'icon.png' : 'icon-inactive.png'});
+    chrome.action.setIcon({ path: active ? 'icon.png' : 'icon-inactive.png' });
 }
 
 const RANDOM_KANJI_ALARM = 'random-kanji-notification';
@@ -8,7 +8,7 @@ const notificationLinks = {};
 chrome.tabs.onActivated.addListener(function (activeInfo) {
     chrome.tabs.sendMessage(
         activeInfo.tabId,
-        {type: 'is-actual-enabled'},
+        { type: 'is-actual-enabled' },
         function (val) {
             setIcon(val);
         }
@@ -68,7 +68,7 @@ function loadKanjiCache() {
         .then(text => {
             const cache = {};
             const lines = text.split('\n');
-            
+
             lines.forEach(line => {
                 line = line.trim();
                 if (line) {
@@ -78,7 +78,7 @@ function loadKanjiCache() {
                     }
                 }
             });
-            
+
             chrome.storage.local.set({ kanjiCache: cache }, () => {
                 console.log(`Loaded ${Object.keys(cache).length} kanji entries into cache`);
             });
@@ -110,36 +110,63 @@ function showRandomKanjiNotification() {
 }
 
 function openUrlFromNotification(targetUrl) {
-    // Open a lightweight helper page in the extension that calls navigator.share.
-    // This works on Android browsers (Chrome) to surface the native share sheet.
-    const sharePage = chrome.runtime.getURL('share.html?u=' + encodeURIComponent(targetUrl));
-    chrome.windows.create({ url: sharePage, focused: true, type: 'popup', width: 420, height: 640 }, function () {
-        if (!chrome.runtime.lastError) {
-            return;
-        }
+    // Primary: open the target URL in a new tab. If that fails (for example
+    // due to platform restrictions), attempt an Android intent:// fallback to
+    // surface app choices. Log errors if both attempts fail.
+    try {
+        chrome.tabs.create({ url: targetUrl }, function (tab) {
+            if (!chrome.runtime.lastError) {
+                return; // opened successfully
+            }
 
-        console.error('Failed to open share window:', chrome.runtime.lastError && chrome.runtime.lastError.message);
-        // Fallback: open as a tab
-        chrome.tabs.create({ url: sharePage }, function () {
-            if (chrome.runtime.lastError) {
-                console.error('Fallback tab open failed:', chrome.runtime.lastError.message);
+            // If creating a normal tab failed, try intent:// fallback for Android
+            console.warn('Opening normal tab failed, attempting intent fallback:', chrome.runtime.lastError.message);
+            try {
+                const stripped = targetUrl.replace(/^https?:\/\//i, '');
+                const intentUrl = `intent://${stripped}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
+                chrome.tabs.create({ url: intentUrl }, function (intentTab) {
+                    if (chrome.runtime.lastError) {
+                        console.error('Intent fallback failed:', chrome.runtime.lastError.message);
+                        // final fallback: try opening the target URL again (best-effort)
+                        chrome.tabs.create({ url: targetUrl }, function () {
+                            if (chrome.runtime.lastError) {
+                                console.error('Final fallback failed:', chrome.runtime.lastError.message);
+                            }
+                        });
+                    }
+                });
+            } catch (intentErr) {
+                console.error('Error constructing intent URL:', intentErr && intentErr.message);
             }
         });
-    });
+    } catch (err) {
+        console.error('Error opening tab:', err && err.message);
+        // As a last resort try intent fallback
+        try {
+            const stripped = targetUrl.replace(/^https?:\/\//i, '');
+            const intentUrl = `intent://${stripped}#Intent;scheme=https;action=android.intent.action.VIEW;end`;
+            chrome.tabs.create({ url: intentUrl }, function () {
+                if (chrome.runtime.lastError) {
+                    console.error('Intent fallback failed in catch:', chrome.runtime.lastError.message);
+                }
+            });
+        } catch (intentErr) {
+            console.error('Error constructing intent URL in catch:', intentErr && intentErr.message);
+        }
+    }
 }
 
-chrome.notifications.onClicked.addListener(function (notificationId) {
+function onClickListener(notificationId) {
     const targetUrl = notificationLinks[notificationId];
     if (targetUrl) {
         openUrlFromNotification(targetUrl);
         chrome.notifications.clear(notificationId);
         delete notificationLinks[notificationId];
     }
-});
+}
 
-chrome.notifications.onClosed.addListener(function (notificationId) {
-    delete notificationLinks[notificationId];
-});
+chrome.notifications.onClicked.addListener(onClickListener);
+chrome.notifications.onButtonClicked.addListener(onClickListener);
 
 function setupRandomKanjiAlarm() {
     chrome.alarms.create(RANDOM_KANJI_ALARM, {

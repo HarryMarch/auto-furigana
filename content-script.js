@@ -301,7 +301,7 @@
                 if (pitchAccentCache[token.surface_form] && includesJapanese(pitchAccentCache[token.surface_form])) {
                     addJapaneseTokenToStorage(pitchAccentCache[token.surface_form]);
                 }
-                rt.textContent = pitchAccentCache[token.surface_form] || japanese.romanize(
+                rt.textContent = pitchAccentCache[token.surface_form] ? pitchAccentCache[token.surface_form] + ' ' : japanese.romanize(
                     includesKana(token.pronunciation) ? token.pronunciation : token.surface_form
                 );
                 dom.appendChild(rt);
