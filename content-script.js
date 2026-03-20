@@ -301,9 +301,13 @@
                 if (pitchAccentCache[token.surface_form] && includesJapanese(pitchAccentCache[token.surface_form])) {
                     addJapaneseTokenToStorage(pitchAccentCache[token.surface_form]);
                 }
-                rt.textContent = pitchAccentCache[token.surface_form] || japanese.romanize(
-                    includesKana(token.pronunciation) ? token.pronunciation : token.surface_form
-                );
+                if (token.surface_form === 'た' && (tokens[i + 1] || {}).surface_form === 'ん') {
+                    rt.textContent = "TA";
+                } else {
+                    rt.textContent = pitchAccentCache[token.surface_form] || japanese.romanize(
+                        includesKana(token.pronunciation) ? token.pronunciation : token.surface_form
+                    );
+                }
                 dom.appendChild(rt);
             } else {
                 dom = document.createTextNode(token.surface_form);
