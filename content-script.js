@@ -270,6 +270,11 @@
     }
 
     // ============== create ruby ==============
+    const specialCases = {
+        'た': 'TA',
+        'てる': 'TÊRƯ',
+    }
+    const specialCaseKeys = Object.keys(specialCases);
     function createRuby(node) {
         const text = node.nodeValue;
         if (!(
@@ -301,8 +306,8 @@
                 if (pitchAccentCache[token.surface_form] && includesJapanese(pitchAccentCache[token.surface_form])) {
                     addJapaneseTokenToStorage(pitchAccentCache[token.surface_form]);
                 }
-                if (token.surface_form === 'た' && (tokens[i + 1] || {}).surface_form === 'ん') {
-                    rt.textContent = "TA";
+                if (specialCaseKeys.includes(token.surface_form) && (tokens[i + 1] || {}).surface_form === 'ん') {
+                    rt.textContent = specialCases[token.surface_form];
                 } else {
                     rt.textContent = pitchAccentCache[token.surface_form] || japanese.romanize(
                         includesKana(token.pronunciation) ? token.pronunciation : token.surface_form
