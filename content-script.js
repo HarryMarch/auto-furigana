@@ -273,6 +273,7 @@
     const specialCases = {
         'た': 'TA',
         'てる': 'TÊRƯ',
+        'する': 'SƯRƯ'
     }
     const specialCaseKeys = Object.keys(specialCases);
     function createRuby(node) {
