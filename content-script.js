@@ -307,7 +307,7 @@
                 if (pitchAccentCache[token.surface_form] && includesJapanese(pitchAccentCache[token.surface_form])) {
                     addJapaneseTokenToStorage(pitchAccentCache[token.surface_form]);
                 }
-                if (specialCaseKeys.includes(token.surface_form) && (tokens[i + 1] || {}).surface_form === 'ん') {
+                if (specialCaseKeys.includes(token.surface_form) && ((tokens[i + 1] || {}).surface_form || '').startsWith('ん')) {
                     rt.textContent = specialCases[token.surface_form];
                 } else {
                     rt.textContent = pitchAccentCache[token.surface_form] || japanese.romanize(
