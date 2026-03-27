@@ -273,7 +273,8 @@
     const specialCases = {
         'た': 'TA',
         'てる': 'TÊRƯ',
-        'する': 'SƯRƯ'
+        'する': 'SƯRƯ',
+        'さ': 'SA',
     }
     const specialCaseKeys = Object.keys(specialCases);
     function createRuby(node) {
@@ -307,7 +308,8 @@
                 if (pitchAccentCache[token.surface_form] && includesJapanese(pitchAccentCache[token.surface_form])) {
                     addJapaneseTokenToStorage(pitchAccentCache[token.surface_form]);
                 }
-                if (specialCaseKeys.includes(token.surface_form) && ((tokens[i + 1] || {}).surface_form || '').startsWith('ん')) {
+                const nextWord = ((tokens[i + 1] || {}).surface_form || '');
+                if ((specialCaseKeys.includes(token.surface_form) && nextWord.startsWith('ん')) || (token.surface_form === 'さ' && ['れ', 'せ'].includes(nextWord))) {
                     rt.textContent = specialCases[token.surface_form];
                 } else {
                     rt.textContent = pitchAccentCache[token.surface_form] || japanese.romanize(
