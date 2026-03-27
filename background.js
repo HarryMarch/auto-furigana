@@ -49,10 +49,8 @@ function loadPitchAccentCache() {
                 });
             });
 
-    Promise.all([
-        loadFile('data/pitch_accent.txt'),
-        loadFile('data/pitch_accent_additional.txt')
-    ])
+    loadFile('data/pitch_accent.txt')
+        .then(() => loadFile('data/pitch_accent_additional.txt'))
         .then(() => {
             chrome.storage.local.set({ pitchAccentCache: cache }, () => {
                 console.log(`Loaded ${Object.keys(cache).length} pitch accent entries into cache`);

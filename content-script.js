@@ -309,7 +309,7 @@
                     addJapaneseTokenToStorage(pitchAccentCache[token.surface_form]);
                 }
                 const nextWord = ((tokens[i + 1] || {}).surface_form || '');
-                if ((specialCaseKeys.includes(token.surface_form) && nextWord.startsWith('ん')) || (token.surface_form === 'さ' && ['れ', 'せ'].includes(nextWord))) {
+                if ((specialCaseKeys.includes(token.surface_form) && nextWord.startsWith('ん')) || (token.surface_form === 'さ' && ['れ', 'せ', 'れる'].includes(nextWord))) {
                     rt.textContent = specialCases[token.surface_form];
                 } else {
                     rt.textContent = pitchAccentCache[token.surface_form] || japanese.romanize(
