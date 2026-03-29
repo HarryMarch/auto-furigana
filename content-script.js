@@ -92,20 +92,13 @@
                 gap: 10px;
             }
 
-            @media (max-width: 768px) {
-                .toast-container {
-                    bottom: 20px;
-                    top: auto;
-                }
-            }
-
             .toast {
                 min-width: 220px;
-                max-width: 320px;
+                max-width: 420px;
                 padding: 12px 16px;
                 border-radius: 8px;
                 color: #fff;
-                font-size: 14px;
+                font-size: 24px;
                 line-height: 1.4;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 
@@ -443,7 +436,7 @@
             const token = tokens[i];
             const willShowToast = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
             if (willShowToast && isTwoKanji(token.surface_form)) {
-                googleTranslate('ja', 'en', token.surface_form).then((res) => {
+                googleTranslate('ja', 'vi', token.surface_form).then((res) => {
                     showToast(token.surface_form + '<br>' + formatGoogleTranslateResult(res));
                 });
             }
