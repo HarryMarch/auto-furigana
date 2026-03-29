@@ -3,6 +3,7 @@
 
     let enableInsertRomaji = true;
     let pitchAccentCache = {};
+    let additionalPitchAccentCache = {};
     let kanjiCache = {};
 
     const excludeTags = new Set(['ruby', 'rt', 'script', 'select', 'option', 'textarea']);
@@ -72,6 +73,7 @@
             chrome.storage.local.get(['pitchAccentCache', 'pitchAccentCacheAdditional', 'kanjiCache', 'kanjiCacheAdditional'], resolve);
         });
         pitchAccentCache = Object.assign({}, storageData.pitchAccentCache || {}, storageData.pitchAccentCacheAdditional || {});
+        additionalPitchAccentCache = Object.assign({}, storageData.pitchAccentCacheAdditional || {});
         kanjiCache = Object.assign({}, storageData.kanjiCache || {}, storageData.kanjiCacheAdditional || {});
 
         const globalDisabled = configs['globalDisabled'] || false;
@@ -282,6 +284,10 @@
         return kanjiRegexp.test(text);
     }
 
+    function isKatakana(word) {
+        return /^[\u30A0-\u30FF]+$/.test(word);
+    }
+
     function isTwoKanji(word) {
         const kanjiRegex = /[\u4E00-\u9FFF]/g;
         const matches = word.match(kanjiRegex);
@@ -436,15 +442,16 @@
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
             const willShowToast = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
-            if (willShowToast && isTwoKanji(token.surface_form) && !pitchAccentCache[token.surface_form]) {
+            if (willShowToast && isTwoKanji(token.surface_form) && !additionalPitchAccentCache[token.surface_form]) {
                 googleTranslate('ja', 'vi', token.surface_form).then((res) => {
                     showToast(token.surface_form + '<br>' + formatGoogleTranslateResult(res));
                 });
-            } else if (willShowToast && includesKana(token.surface_form)) {
-                googleTranslate('ja', 'en', token.surface_form).then((res) => {
-                    showToast(token.surface_form + '<br>' + formatGoogleTranslateResult(res));
-                });
             }
+            // if (willShowToast && isKatakana(token.surface_form)) {
+            //     googleTranslate('ja', 'en', token.surface_form).then((res) => {
+            //         showToast(token.surface_form + '<br>' + formatGoogleTranslateResult(res));
+            //     });
+            // }
 
             let dom;
             if (includesKana(token.pronunciation) || includesJapanese(token.surface_form)) {
