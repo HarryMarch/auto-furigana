@@ -84,6 +84,49 @@ function loadKanjiCache() {
         .catch(err => console.error('Failed to load kanji cache:', err));
 }
 
+const memoryCache = {}; // in-memory cache
+
+async function fetchJisho(kanji) {
+    if (memoryCache[kanji]) {
+        return memoryCache[kanji];
+    }
+    const url = `https://jisho.org/api/v1/search/words?keyword=${encodeURIComponent(kanji)}`;
+
+    try {
+        const res = await fetch(url);
+        const json = await res.json();
+
+        const results = [];
+
+        json.data.forEach(entry => {
+            [entry.japanese[0] || { word: '' }].forEach(jp => {
+                const word = jp.word;
+                const reading = jp.reading;
+
+                // ✅ Filter: must have word and exactly 2 kanji chars
+                if (word && isTwoKanji(word)) {
+                    // const definition = entry.senses[0]?.english_definitions?.join("; ") || "";
+
+                    results.push(`${word}[${reading}]`);
+                }
+            });
+        });
+
+        const definitions = results.length ? results.join(", ") : "";
+        memoryCache[kanji] = definitions;
+        return definitions;
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+// 🔍 Helper: check exactly 2 kanji
+function isTwoKanji(word) {
+    const kanjiRegex = /[\u4E00-\u9FFF]/g;
+    const matches = word.match(kanjiRegex);
+    return matches && matches.length === 2 && word.length === 2;
+}
+
 function showRandomKanjiNotification() {
     chrome.storage.local.get(['kanjiCache'], function (result) {
         const cache = result.kanjiCache || {};
@@ -98,11 +141,14 @@ function showRandomKanjiNotification() {
         const notificationId = `random-kanji-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
         notificationLinks[notificationId] = `https://jisho.org/search/*${encodeURIComponent(kanji)}*`;
 
-        chrome.notifications.create(notificationId, {
-            type: 'basic',
-            iconUrl: 'icon.png',
-            title: 'Random Kanji',
-            message: `${kanji}: ${meaning}`
+        fetchJisho(kanji).then(definitions => {
+            const message = `${meaning}`;
+            chrome.notifications.create(notificationId, {
+                type: 'basic',
+                iconUrl: 'icon.png',
+                title: definitions ? `${kanji}: ${definitions}` : kanji,
+                message: message
+            });
         });
     });
 }
