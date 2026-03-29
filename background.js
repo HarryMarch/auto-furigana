@@ -106,8 +106,8 @@ async function fetchJisho(kanji) {
                 // ✅ Filter: must have word and exactly 2 kanji chars
                 if (word && isTwoKanji(word)) {
                     // const definition = entry.senses[0]?.english_definitions?.join("; ") || "";
-
-                    results.push(`${word}[${reading}]`);
+                    // results.push(`${word}[${reading}]`);
+                    results.push(word);
                 }
             });
         });
@@ -215,7 +215,7 @@ chrome.notifications.onButtonClicked.addListener(onClickListener);
 function setupRandomKanjiAlarm() {
     chrome.alarms.create(RANDOM_KANJI_ALARM, {
         delayInMinutes: 1,
-        periodInMinutes: 5
+        periodInMinutes: 2
     });
 }
 
