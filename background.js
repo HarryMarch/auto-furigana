@@ -215,7 +215,7 @@ chrome.notifications.onButtonClicked.addListener(onClickListener);
 function setupRandomKanjiAlarm() {
     chrome.alarms.create(RANDOM_KANJI_ALARM, {
         delayInMinutes: 1,
-        periodInMinutes: 2
+        periodInMinutes: 5
     });
 }
 
