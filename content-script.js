@@ -100,7 +100,7 @@
             [class^="css-"][class*="--DivVideoControlTop"] > div > div {
                 position: absolute !important;
                 z-index: 9999 !important;
-                margin-top: -450px;
+                margin-top: -650px;
                 width: 100%;
             }
 
