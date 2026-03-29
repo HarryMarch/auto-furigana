@@ -82,6 +82,60 @@
         observer.observe(document, { childList: true, subtree: true });
         const style = document.createElement('style');
         style.textContent = `
+            .toast-container {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            @media (max-width: 768px) {
+                .toast-container {
+                    bottom: 20px;
+                    top: auto;
+                }
+            }
+
+            .toast {
+                min-width: 220px;
+                max-width: 320px;
+                padding: 12px 16px;
+                border-radius: 8px;
+                color: #fff;
+                font-size: 14px;
+                line-height: 1.4;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+
+                opacity: 0;
+                transform: translateY(-10px);
+                animation: toast-in 0.25s ease forwards;
+            }
+
+            .toast.success { background: #4caf50; }
+            .toast.error   { background: #f44336; }
+            .toast.info    { background: #2196f3; }
+
+            .toast.hide {
+                animation: toast-out 0.25s ease forwards;
+            }
+
+            @keyframes toast-in {
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            @keyframes toast-out {
+                to {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+            }
+            
             div.lln-vertical-view-sub.lln-sentence-wrap.lln-with-play-btn.odd.lln-bigger-item-font.in-scroll.active {
                 background-color: yellowgreen !important;
             }
@@ -152,6 +206,17 @@
                 window.location.replace(url.toString()); // reload with ?lang=ja
             }
         }
+
+        // Define toast container element
+        let container = document.getElementById("toast-container");
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "toast-container";
+            container.className = "toast-container";
+
+            document.body.appendChild(container);
+        }
+        // 
         if (enableInsertRomaji) {
             scanDocument();
         }
@@ -224,6 +289,69 @@
         return kanjiRegexp.test(text);
     }
 
+    function isTwoKanji(word) {
+        const kanjiRegex = /[\u4E00-\u9FFF]/g;
+        const matches = word.match(kanjiRegex);
+        return matches && matches.length === 2 && word.length === 2;
+    }
+
+    const toastQueue = [];
+    let isProcessing = false;
+
+    // Track active (visible) toasts
+    const activeToasts = new Set();
+
+    function showToast(message, type = "info", duration = 2500) {
+        const container = document.getElementById("toast-container");
+        if (!container) {
+            return;
+        }
+        const key = `${type}|${message}`;
+
+        // ❌ Skip if already queued
+        const existsInQueue = toastQueue.some(t => `${t.type}|${t.message}` === key);
+
+        // ❌ Skip if already visible
+        if (existsInQueue || activeToasts.has(key)) {
+            return;
+        }
+
+        toastQueue.push({ message, type, duration, key });
+        processQueue();
+    }
+
+    function processQueue() {
+        if (isProcessing) return;
+        if (toastQueue.length === 0) return;
+
+        isProcessing = true;
+
+        const { message, type, duration, key } = toastQueue.shift();
+        const container = document.getElementById("toast-container");
+
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerHTML = message;
+
+        container.appendChild(toast);
+
+        // Mark as active
+        activeToasts.add(key);
+
+        // Lifetime (FIFO behavior preserved)
+        setTimeout(() => {
+            toast.classList.add("hide");
+
+            setTimeout(() => {
+                toast.remove();
+                activeToasts.delete(key); // ✅ allow future duplicates again
+            }, 250);
+        }, duration);
+
+        isProcessing = false;
+        processQueue();
+    }
+
     function includesJapanese(text) {
         return includesKana(text) || includesKanji(text);
     }
@@ -252,6 +380,10 @@
     }
 
     // ============== scan document ==============
+    const captionClassNames = [
+        'DivVideoClosedCaption',
+        'ytp-caption-segment',
+    ];
     function scanDocument() {
         const stack = [document.body];
         const textNodes = [];
@@ -288,7 +420,7 @@
         'さ': 'SA',
     }
     const specialCaseKeys = Object.keys(specialCases);
-    function createRuby(node) {
+    async function createRuby(node) {
         const text = node.nodeValue;
         if (!(
             isPageChinese && includesKana(text) // prevent treating chinese as japanese kanji
@@ -309,6 +441,12 @@
         }
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
+            const willShowToast = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
+            if (willShowToast && isTwoKanji(token.surface_form)) {
+                googleTranslate('ja', 'en', token.surface_form).then((res) => {
+                    showToast(token.surface_form + '<br>' + formatGoogleTranslateResult(res));
+                });
+            }
 
             let dom;
             if (includesKana(token.pronunciation) || includesJapanese(token.surface_form)) {
@@ -358,6 +496,18 @@
         });
     }
 
+    function formatGoogleTranslateResult(res) {
+        if (res.dict?.length) {
+            return res.dict.map(item =>
+                item.pos + ' ' + item.entry.map(item => item.word).join(', ')
+            ).join('<br>');
+        } else if (res.sentences?.length) {
+            return res.sentences.map(item => item.trans).join(', `');
+        } else {
+            return undefined;
+        }
+    }
+
     // ============== translation ==============
     const translationDom = document.createElement('div');
     translationDom.classList.add('chrome-ext-furigana-translation');
@@ -404,12 +554,8 @@
                     kanjiInfo += char + ': ' + kanjiCache[char] + '<br>';
                 }
             });
-            if (res.dict?.length) {
-                translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + text.split().join('<br>') + '<br>' + res.dict.map(item =>
-                    item.pos + ' ' + item.entry.map(item => item.word).join(', ')
-                ).join('<br>');
-            } else if (res.sentences?.length) {
-                translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + res.sentences.map(item => item.trans).join(', `');
+            if (formatGoogleTranslateResult(res)) {
+                translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + formatGoogleTranslateResult(res);
             } else {
                 return;
             }
