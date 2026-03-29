@@ -98,7 +98,7 @@
                 padding: 12px 16px;
                 border-radius: 8px;
                 color: #fff;
-                font-size: 24px;
+                font-size: 40px;
                 line-height: 1.4;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 
@@ -410,6 +410,7 @@
         'た': 'TA',
         'てる': 'TÊRƯ',
         'する': 'SƯRƯ',
+        'れる': 'RÊRƯ',
         'さ': 'SA',
     }
     const specialCaseKeys = Object.keys(specialCases);
@@ -435,8 +436,12 @@
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
             const willShowToast = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
-            if (willShowToast && isTwoKanji(token.surface_form)) {
+            if (willShowToast && isTwoKanji(token.surface_form) && !pitchAccentCache[token.surface_form]) {
                 googleTranslate('ja', 'vi', token.surface_form).then((res) => {
+                    showToast(token.surface_form + '<br>' + formatGoogleTranslateResult(res));
+                });
+            } else if (willShowToast && includesKana(token.surface_form)) {
+                googleTranslate('ja', 'en', token.surface_form).then((res) => {
                     showToast(token.surface_form + '<br>' + formatGoogleTranslateResult(res));
                 });
             }
