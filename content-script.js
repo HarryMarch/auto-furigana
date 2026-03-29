@@ -90,30 +90,41 @@
                 display: none !important;
             }
 
-            .css-16dqvl7-7937d88b--DivVideoClosedCaption {
+            [class^="css-"][class*="--DivOverlayBottomContent"] > div > div {
                 position: absolute !important;
                 top: 2% !important;
                 left: 5% !important;
                 z-index: 9999 !important;
             }
 
-            .css-16dqvl7-7937d88b--DivVideoClosedCaption > ruby {
+            [class^="css-"][class*="--DivVideoControlTop"] > div > div {
+                position: absolute !important;
+                z-index: 9999 !important;
+                margin-top: -450px;
+                width: 100%;
+            }
+
+            [class^="css-"][class*="--DivSecondPartyTagsContainer"], [class^="css-"][class*="--DivMultilineTextContainer"] {
+                display: none !important;
+            }
+
+            [class^="css-"][class*="--DivVideoClosedCaption"] > ruby {
                 font-size: 1rem !important;
             }
 
-            .css-16dqvl7-7937d88b--DivVideoClosedCaption > ruby > rt {
+            [class^="css-"][class*="--DivVideoClosedCaption"] > ruby > rt {
                 font-size: 3rem !important;
             }
 
-            .css-56cod3-7937d88b--DivMediaCardOverlayTop {
-                flex-direction: column !important;
-            }
-
-            .css-3rm8q2-7937d88b--DivMediaCardOverlay {
+            [class^="css-"][class*="--DivMediaCardOverlay"] {
                 flex-direction: row-reverse !important;
             }
 
-            .css-1iectv1-7937d88b--DivMediaCardOverlayBottom {
+            [class^="css-"][class*="--DivMediaCardOverlayTop"] {
+                flex-direction: column !important;
+            }
+
+            [class^="css-"][class*="--DivMediaCardOverlayBottom"] {
                 width: 100% !important;
             }
 
