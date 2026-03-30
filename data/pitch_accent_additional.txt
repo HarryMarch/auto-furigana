@@ -1,4 +1,3 @@
-付い;tsuꜛi
 おそるおそる;oꜛsoruosoru
 仕草;shiꜛgusa
 感じ取っ;kaꜛnjito'
@@ -57,7 +56,6 @@
 はず;ꜜhazu~
 めんどくさい;meꜛndokusai
 みんな;miꜛnna
-ござい;goꜛzai
 いくつ;ꜛiꜜkutsu
 国内外;kokuꜛnaigai
 片付け;kataꜛzuke
@@ -81,6 +79,7 @@
 ご;GỒ
 て;TÊ
 付い;CHƯI
+つい;CHƯI
 です;ĐỆS
 どこ;ĐÔKÔ
 な;NA
