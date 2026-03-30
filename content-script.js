@@ -3,7 +3,6 @@
 
     let enableInsertRomaji = true;
     let pitchAccentCache = {};
-    let additionalPitchAccentCache = {};
     let kanjiCache = {};
 
     const excludeTags = new Set(['ruby', 'rt', 'script', 'select', 'option', 'textarea']);
@@ -18,7 +17,8 @@
         '意味', '理解', '可能', '不可能', '原因', '結果', '方法', '目的', '計画', '決定',
         '新聞', '記事', '放送', '番組', '連続', '中止', '変更', '発表', '会議', '予定',
         '無理', '十分', '普通', '特に', '全然', '必ず', '多分', '一度', '二度',
-        '急に', '直接', '間接', '連休', '平日', '休日', '今回', '次回', '前回', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+        '急に', '直接', '間接', '連休', '平日', '休日', '今回', '次回', '前回', 
+        '自分', '結構', '本当', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
 
     // ============== observe ==============
     let domChanged = false;
@@ -85,7 +85,6 @@
             chrome.storage.local.get(['pitchAccentCache', 'pitchAccentCacheAdditional', 'kanjiCache', 'kanjiCacheAdditional'], resolve);
         });
         pitchAccentCache = Object.assign({}, storageData.pitchAccentCache || {}, storageData.pitchAccentCacheAdditional || {});
-        additionalPitchAccentCache = Object.assign({}, storageData.pitchAccentCacheAdditional || {});
         kanjiCache = Object.assign({}, storageData.kanjiCache || {}, storageData.kanjiCacheAdditional || {});
 
         const globalDisabled = configs['globalDisabled'] || false;
@@ -455,7 +454,7 @@
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
             const willShowToast = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
-            if (willShowToast && isTwoKanji(token.surface_form) && !additionalPitchAccentCache[token.surface_form] && !WHITE_LISTED_KANJI.has(token.surface_form)) {
+            if (willShowToast && isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form)) {
                 googleTranslate('ja', 'vi', token.surface_form).then((res) => {
                     showToast(token.surface_form + '<br>' + formatGoogleTranslateResult(res));
                 });
