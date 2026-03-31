@@ -431,6 +431,7 @@
         'する': 'SƯRƯ',
         'れる': 'RÊRƯ',
         'ある': 'ARƯ',
+        'できる': 'ĐỀKIRƯ',
         'さ': 'SA',
     }
     const specialCaseKeys = Object.keys(specialCases);
