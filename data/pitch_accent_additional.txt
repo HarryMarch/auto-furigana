@@ -59,6 +59,8 @@
 いくつ;ꜛiꜜkutsu
 国内外;kokuꜛnaigai
 片付け;kataꜛzuke
+話;HÀNASHI
+話し;HÀNASHI
 で;DE
 も;MO
 が;GA
@@ -81,6 +83,7 @@
 付い;CHƯI
 つい;CHƯI
 です;ĐỆS
+じゃ;JẠ
 どこ;ĐÔKÔ
 な;NA
 の;NO
@@ -118,6 +121,7 @@
 たい;TAI
 づざい;ZƯRAI
 みたい;MITAI
+だけど;ĐAKỀĐỒ
 たら;TÀRÀ
 なら;NÀRÀ
 かも;KÀMÔ
@@ -148,6 +152,7 @@
 意外と;ÌGAITỐ
 絶対;ZỆTTAI
 そんなに;SÔNNANÍ
+にとって;NÍTỐTTỀ
 として;TỐSHITÊ
 特に;TÔKỰNÍ
 確か;TASHIKÀ
@@ -179,3 +184,5 @@
 くださっ;KƯĐASÁT
 くださる;KƯĐASARỰ
 ござい;GỒZAI
+いくつ;ÍKƯTSỰ
+いろいろ;ÌRÔ-IRÔ
