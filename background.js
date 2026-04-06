@@ -104,7 +104,7 @@ async function fetchJisho(kanji) {
                 const reading = jp.reading;
 
                 // ✅ Filter: must have word and exactly 2 kanji chars
-                if (word && isTwoKanji(word)) {
+                if (word && isTwoKanji(word) && word.includes(kanji)) {
                     // const definition = entry.senses[0]?.english_definitions?.join("; ") || "";
                     // results.push(`${word}[${reading}]`);
                     results.push(word);
