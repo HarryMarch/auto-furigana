@@ -461,6 +461,49 @@ Vue.createApp({
                     alert(`Error exporting pitch accent data: ${err.message}`);
                     console.error('Export error:', err);
                 }
+            } else if (message.type === 'export-japanese-token-result') {
+                try {
+                    const content = message.content;
+                    if (content && typeof content === 'object' && content.downloadedByHost) {
+                        alert(`Exported ${content.entryCount || 0} entries to japaneseToken.txt`);
+                        return;
+                    }
+
+                    const text = typeof content === 'string' ? content : '';
+                    const items = text.split(';').filter(Boolean);
+                    const formattedText = text.replaceAll(';', '\n');
+                    const entryCount = items.length;
+                    if (entryCount === 0) {
+                        alert('No japaneseToken data to export.');
+                        return;
+                    }
+
+                    const blob = new Blob([formattedText], { type: 'text/plain;charset=utf-8' });
+                    const objUrl = URL.createObjectURL(blob);
+
+                    const a = document.createElement('a');
+                    a.href = objUrl;
+                    a.download = 'japaneseToken.txt';
+                    a.style.display = 'none';
+                    document.body.appendChild(a);
+                    setTimeout(() => {
+                        try {
+                            a.target = '_blank';
+                            a.rel = 'noopener';
+                            a.click();
+                        } catch (err) {
+                            a.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                        }
+                        setTimeout(() => {
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(objUrl);
+                            alert(`Successfully exported ${entryCount} entries to japaneseToken.txt`);
+                        }, 300);
+                    }, 100);
+                } catch (err) {
+                    alert(`Error exporting japaneseToken data: ${err.message}`);
+                    console.error('Export error:', err);
+                }
             }
         });
 

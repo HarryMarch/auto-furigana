@@ -171,6 +171,29 @@
                         postMessage('export-kanji-additional-result', cache);
                     }
                 });
+                chrome.storage.local.get('japaneseToken', function (result) {
+                    const content = typeof result.japaneseToken === 'string' ? result.japaneseToken : '';
+                    const entryCount = content.split(';').filter(Boolean).length;
+                    if (entryCount === 0) {
+                        postMessage('export-japanese-token-result', content);
+                        return;
+                    }
+                    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                    try {
+                        const objUrl = URL.createObjectURL(blob);
+                        if (chrome && chrome.downloads && typeof chrome.downloads.download === 'function') {
+                            chrome.downloads.download({ url: objUrl, filename: 'japaneseToken.txt' }, function (downloadId) {
+                                setTimeout(() => URL.revokeObjectURL(objUrl), 1000);
+                                postMessage('export-japanese-token-result', { downloadedByHost: true, entryCount });
+                            });
+                        } else {
+                            postMessage('export-japanese-token-result', content);
+                        }
+                    } catch (err) {
+                        console.error('Download failed in popup, falling back to sandbox:', err);
+                        postMessage('export-japanese-token-result', content);
+                    }
+                });
             }
                 break;
         }
