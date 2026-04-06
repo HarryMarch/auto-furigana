@@ -180,6 +180,7 @@
 
             [class^="css-"][class*="--DivVideoClosedCaption"] > ruby {
                 font-size: 1rem !important;
+                color: beige;
             }
 
             [class^="css-"][class*="--DivVideoClosedCaption"] > ruby > rt {
