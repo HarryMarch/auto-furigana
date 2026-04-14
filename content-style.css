@@ -34,3 +34,7 @@ ruby.chrome-ext-furigana:hover rt {
 .ytwTranscriptSegmentViewModelHostActive > span.yt-core-attributed-string ruby.chrome-ext-furigana > rt {
     font-size: 2.5rem !important;
 }
+
+.color-highlight {
+    color: blueviolet !important;
+}

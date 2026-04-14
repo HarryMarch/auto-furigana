@@ -28,7 +28,7 @@
         '自分', '結構', '本当', '一応', '全部', '女性', '男性', '言葉', '合格', '人間',
         '場合', '綺麗', '高校', '一番', '家族', '基本', '秘密', '動画', '会話', '相手', '紹介', '重要', '失敗', '部分', '成功',
         '世界', '漢字', '緊張', '存在', '彼女', '中国', '韓国', '試合', '温泉', '面接', '心配',
-        '警察', '突然', '母親', '父親', '笑顔', '荷物', '風邪', '個人', '先輩', '社長', '挨拶', '野球', 
+        '警察', '突然', '母親', '父親', '笑顔', '荷物', '風邪', '個人', '先輩', '社長', '挨拶', '野球',
         '是非', '店員', '態度', '興味', '息子', '恋人', '情報', '恋愛', '美人', '今度', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
 
     // ============== observe ==============
@@ -466,8 +466,8 @@
         }
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
-            const willShowToast = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
-            if (willShowToast && isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form)) {
+            const willShowToast = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls)) && isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form);
+            if (willShowToast) {
                 googleTranslate('ja', 'vi', token.surface_form).then((res) => {
                     const meaning = formatGoogleTranslateResult(res);
                     const pronunciation = token.pronunciation ? japanese.romanize(token.pronunciation).toLowerCase() : '';
@@ -486,6 +486,7 @@
             if (includesKana(token.pronunciation) || includesJapanese(token.surface_form)) {
                 dom = document.createElement('ruby');
                 dom.classList.add('chrome-ext-furigana');
+                willShowToast && dom.classList.add('color-highlight');
                 dom.appendChild(document.createTextNode(token.surface_form));
                 const rt = document.createElement('rt');
                 if (pitchAccentCache[token.surface_form] && includesJapanese(pitchAccentCache[token.surface_form])) {
