@@ -4,6 +4,14 @@
     let enableInsertRomaji = true;
     let pitchAccentCache = {};
     let kanjiCache = {};
+    const highlightClasses = ['success' /* green */, 'error' /* red */, 'info' /* blue */];
+    let currentIndex = 0;
+
+    function getNextClass() {
+        const value = highlightClasses[currentIndex];
+        currentIndex = (currentIndex + 1) % highlightClasses.length;
+        return value;
+    }
 
     const excludeTags = new Set(['ruby', 'rt', 'script', 'select', 'option', 'textarea']);
     const WHITE_LISTED_KANJI = new Set(['学校', '学生', '先生', '勉強', '日本', '英語',
@@ -467,12 +475,13 @@
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
             const willShowToast = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls)) && isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form);
+            const highlightClass = getNextClass();
             if (willShowToast) {
                 googleTranslate('ja', 'vi', token.surface_form).then((res) => {
                     const meaning = formatGoogleTranslateResult(res);
                     const pronunciation = token.pronunciation ? japanese.romanize(token.pronunciation).toLowerCase() : '';
                     if (meaning.toLowerCase() !== pronunciation) {
-                        showToast(token.surface_form + '<br>' + meaning);
+                        showToast(token.surface_form + '<br>' + meaning, highlightClass);
                     }
                 });
             }
@@ -486,7 +495,7 @@
             if (includesKana(token.pronunciation) || includesJapanese(token.surface_form)) {
                 dom = document.createElement('ruby');
                 dom.classList.add('chrome-ext-furigana');
-                willShowToast && dom.classList.add('color-highlight');
+                willShowToast && dom.classList.add(`color-${highlightClass}`);
                 dom.appendChild(document.createTextNode(token.surface_form));
                 const rt = document.createElement('rt');
                 if (pitchAccentCache[token.surface_form] && includesJapanese(pitchAccentCache[token.surface_form])) {
