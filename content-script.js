@@ -4,14 +4,7 @@
     let enableInsertRomaji = true;
     let pitchAccentCache = {};
     let kanjiCache = {};
-    const highlightClasses = ['success' /* green */, 'error' /* red */, 'info' /* blue */];
-    let currentIndex = 0;
-
-    function getNextClass() {
-        const value = highlightClasses[currentIndex];
-        currentIndex = (currentIndex + 1) % highlightClasses.length;
-        return value;
-    }
+    const highlightClasses = ['success' /* green */, 'error' /* red */, 'info' /* blue */, 'warning' /* orange */, 'highlight' /* yellow */];
 
     const excludeTags = new Set(['ruby', 'rt', 'script', 'select', 'option', 'textarea']);
     const WHITE_LISTED_KANJI = new Set(['学校', '学生', '先生', '勉強', '日本', '英語',
@@ -37,7 +30,8 @@
         '場合', '綺麗', '高校', '一番', '家族', '基本', '秘密', '動画', '会話', '相手', '紹介', '重要', '失敗', '部分', '成功',
         '世界', '漢字', '緊張', '存在', '彼女', '中国', '韓国', '試合', '温泉', '面接', '心配',
         '警察', '突然', '母親', '父親', '笑顔', '荷物', '風邪', '個人', '先輩', '社長', '挨拶', '野球',
-        '是非', '店員', '態度', '興味', '息子', '恋人', '情報', '恋愛', '美人', '今度', '財布', '怪我', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+        '是非', '店員', '態度', '興味', '息子', '恋人', '情報', '恋愛', '美人', '今度', '財布', '怪我',
+        '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
 
     // ============== observe ==============
     let domChanged = false;
@@ -117,7 +111,7 @@
             .toast-container {
                 position: fixed;
                 top: 20px;
-                right: 20px;
+                right: 60px;
                 z-index: 9999;
                 display: flex;
                 flex-direction: column;
@@ -139,9 +133,11 @@
                 animation: toast-in 0.25s ease forwards;
             }
 
-            .toast.success { background: #4caf50; }
-            .toast.error   { background: #f44336; }
-            .toast.info    { background: #2196f3; }
+            .toast.success   { background: #4caf50; }
+            .toast.error     { background: #f44336; }
+            .toast.info      { background: #2196f3; }
+            .toast.warning   { background: #ff9800; }
+            .toast.highlight { background: #f2ff00; color: #000; }
 
             .toast.hide {
                 animation: toast-out 0.25s ease forwards;
@@ -475,7 +471,7 @@
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
             const willShowToast = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls)) && isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form);
-            const highlightClass = getNextClass();
+            const highlightClass = highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
             if (willShowToast) {
                 googleTranslate('ja', 'vi', token.surface_form).then((res) => {
                     const meaning = formatGoogleTranslateResult(res);

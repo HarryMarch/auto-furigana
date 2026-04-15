@@ -46,3 +46,11 @@ ruby.chrome-ext-furigana:hover rt {
 .color-info {
     color: #2196f3 !important;
 }
+
+.color-warning {
+    color: #ff9800 !important;
+}
+
+.color-highlight {
+    color: #f2ff00 !important;
+}
