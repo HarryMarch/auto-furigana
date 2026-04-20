@@ -15,6 +15,121 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
     );
 });
 
+let sheetsCache = null;
+
+async function loadCache() {
+    if (!sheetsCache) {
+        const data = await chrome.storage.local.get("sheets");
+        sheetsCache = data.words || {};
+    }
+}
+
+async function addWordIfNew(word) {
+    await loadCache();
+
+    if (sheetsCache[word]) {
+        return false;
+    }
+
+    sheetsCache[word] = true;
+    chrome.storage.local.set({ words: sheetsCache }); // async but fine
+
+    return true;
+}
+
+function formatGoogleTranslateResult(res) {
+    if (res.dict?.length) {
+        return res.dict.map(item =>
+            item.pos + ' ' + item.entry.map(item => item.word).join(', ')
+        ).join('<br>');
+    } else if (res.sentences?.length) {
+        return res.sentences.map(item => item.trans).join(', `');
+    } else {
+        return undefined;
+    }
+}
+
+let queue = [];
+let timer = null;
+
+const BATCH_DELAY = 30000; // 30s
+const MAX_BATCH_SIZE = 100;
+
+async function appendRow(values) {
+    return new Promise((resolve, reject) => {
+        queue.push({ values, resolve, reject });
+
+        // Flush immediately if max reached
+        if (queue.length >= MAX_BATCH_SIZE) {
+            flush();
+            return;
+        }
+
+        // Start timer once
+        if (!timer) {
+            timer = setTimeout(() => {
+                flush();
+            }, BATCH_DELAY);
+        }
+    });
+}
+
+function getAuthToken() {
+    return new Promise((resolve, reject) => {
+        chrome.identity.getAuthToken({ interactive: true }, (token) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else if (!token) {
+                reject(new Error("No token received"));
+            } else {
+                resolve(token);
+            }
+        });
+    });
+}
+
+async function flush() {
+    if (queue.length === 0) return;
+
+    const batch = [...queue];
+    queue = [];
+    clearTimeout(timer);
+    timer = null;
+
+    const allValues = batch.map(item => item.values);
+
+    try {
+        const spreadsheetId = "1cn4oqEtj9r1MwPYyt9L0pKO-cO0yYYDriihFrLNBlhM";
+        const range = "Sheet1!A:C";
+
+        const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
+
+        const token = await getAuthToken();
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                values: allValues,
+            }),
+        });
+
+        const data = await res.json(); console.log('Append response:', data);
+
+        // Resolve all pending promises
+        batch.forEach(item => item.resolve(data));
+
+    } catch (err) {
+        // Reject all if failed
+        batch.forEach(item => item.reject(err));
+
+        // Optional: requeue
+        queue.unshift(...batch);
+    }
+}
+
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
     if (!message) {
         return;
@@ -24,7 +139,19 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
             setIcon(message.content);
             break;
         case 'fetch-json':
-            fetch(message.content).then(res => res.json().then(sendResponse));
+            fetch(message.content).then(res => res.json().then(json => {
+                const meaning = formatGoogleTranslateResult(json);
+                const params = new URL(message.content).searchParams;
+                const word = decodeURIComponent(params.get('q'));
+                addWordIfNew(word).then(isNew => {
+                    if (isNew) {
+                        console.log("New word added:", word);
+                        appendRow([word, meaning]);
+                    }
+                });
+
+                sendResponse(meaning);
+            }));
             return true;
     }
 });

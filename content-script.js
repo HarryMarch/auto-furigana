@@ -35,8 +35,8 @@
         '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
 
     const BLACK_LISTED_WORDS = new Set([
-        '', '', '', '', '', '',
-        '', '', '', '', '', '',
+        '映る', '', '', '', '', '',
+        '収まる', '', '', '', '', '',
         '', '', '', '', '', '',
         '', '', '', '', '', '',
         '', '', '', '', '', '',
@@ -286,6 +286,7 @@
                             el.pause();
                         }
                     });
+                    window.open("https://github.com/HarryMarch/auto-furigana/edit/main/content-script.js", "_blank");
                     const content = extractRubyBase(el.innerHTML);
                     await navigator.clipboard.writeText(content);
 
@@ -374,10 +375,10 @@
         return /^[\u30A0-\u30FF]+$/.test(word);
     }
 
-    function isTwoKanji(word) {
+    function isTwoOrThreeKanji(word) {
         const kanjiRegex = /[\u4E00-\u9FFF]/g;
         const matches = word.match(kanjiRegex);
-        return matches && matches.length === 2 && word.length === 2;
+        return matches && matches.length === word.length && word.length > 1;
     }
 
     const toastQueue = [];
@@ -530,13 +531,13 @@
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
             const isCaption = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
-            const willShowToast = isCaption &&
-                (isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form))
-                || BLACK_LISTED_WORDS.has(token.surface_form);
+            const isWhiteListed = (isTwoOrThreeKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form))
+            const isBlackListed = BLACK_LISTED_WORDS.has(token.surface_form);
+            const willShowToast = isCaption && (isWhiteListed
+                || isBlackListed);
             const highlightClass = highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
             if (willShowToast) {
-                googleTranslate('ja', 'vi', token.surface_form).then((res) => {
-                    const meaning = formatGoogleTranslateResult(res);
+                googleTranslate('ja', isWhiteListed ? 'vi' : 'en', token.surface_form).then((meaning) => {
                     const pronunciation = token.pronunciation ? japanese.romanize(token.pronunciation).toLowerCase() : '';
                     if (meaning.toLowerCase() !== pronunciation) {
                         showToast(token.surface_form + '<br>' + meaning, highlightClass);
@@ -593,22 +594,10 @@
         }
         return googleTranslateCache[hash] = new Promise(function (resolve) {
             const url = `https://clients5.google.com/translate_a/single?dj=1&dt=t&dt=sp&dt=ld&dt=bd&client=dict-chrome-ex&sl=${sLang}&tl=${tLang}&q=${encodeURIComponent(text)}`;
-            chrome.runtime.sendMessage({ type: 'fetch-json', content: url }, function (json) {
-                resolve(json);
+            chrome.runtime.sendMessage({ type: 'fetch-json', content: url }, function (meaning) {
+                resolve(meaning);
             });
         });
-    }
-
-    function formatGoogleTranslateResult(res) {
-        if (res.dict?.length) {
-            return res.dict.map(item =>
-                item.pos + ' ' + item.entry.map(item => item.word).join(', ')
-            ).join('<br>');
-        } else if (res.sentences?.length) {
-            return res.sentences.map(item => item.trans).join(', `');
-        } else {
-            return undefined;
-        }
     }
 
     // ============== translation ==============
@@ -650,15 +639,15 @@
                 return;
             }
             const text = textNode.data || '';
-            const res = await googleTranslate('ja', configs['targetLang'] || 'en', text);
+            const meaning = await googleTranslate('ja', configs['targetLang'] || 'en', text);
             let kanjiInfo = '';
             text.split('').forEach(char => {
                 if (kanjiCache[char]) {
                     kanjiInfo += char + ': ' + kanjiCache[char] + '<br>';
                 }
             });
-            if (formatGoogleTranslateResult(res)) {
-                translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + formatGoogleTranslateResult(res);
+            if (meaning) {
+                translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + meaning;
             } else {
                 return;
             }
