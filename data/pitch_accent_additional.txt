@@ -65,6 +65,7 @@
 話し;HÀNASHI
 考え;KĂNGGAÊ
 者;SHẠ
+点;TỀN
 で;DE
 も;MO
 が;GA
@@ -82,6 +83,7 @@
 それ;SỒRÊ
 それで;SỒRÊĐẾ
 そのまま;SỒNÔMAMA
+ため;TAMÊ
 ご;GỒ
 て;TÊ
 付い;CHƯI
