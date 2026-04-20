@@ -31,7 +31,25 @@
         '世界', '漢字', '緊張', '存在', '彼女', '中国', '韓国', '試合', '温泉', '面接', '心配',
         '警察', '突然', '母親', '父親', '笑顔', '荷物', '風邪', '個人', '先輩', '社長', '挨拶', '野球',
         '是非', '店員', '態度', '興味', '息子', '恋人', '情報', '恋愛', '美人', '今度', '財布', '怪我',
-        '文化', '店長', '不安', '人生', '失礼', '以外', '注文', '家賃', '担当', '画面', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+        '文化', '店長', '不安', '人生', '失礼', '以外', '注文', '家賃', '担当', '画面', '', '', '', '',
+        '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+
+    const BLACK_LISTED_WORDS = new Set([
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+        '', '', '', '', '', '',
+    ]);
 
     // ============== observe ==============
     let domChanged = false;
@@ -263,9 +281,13 @@
 
                 try {
                     e.target.classList.add("hidden");
+                    document.querySelectorAll("video, audio").forEach(el => {
+                        if (!el.paused) {
+                            el.pause();
+                        }
+                    });
                     const content = extractRubyBase(el.innerHTML);
                     await navigator.clipboard.writeText(content);
-                    console.log("Copied:", content);
 
                     // optional: hide after copy
                     // el.classList.add("hidden");
@@ -507,7 +529,10 @@
         }
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
-            const willShowToast = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls)) && isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form);
+            const isCaption = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
+            const willShowToast = isCaption &&
+                (isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form))
+                || BLACK_LISTED_WORDS.has(token.surface_form);
             const highlightClass = highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
             if (willShowToast) {
                 googleTranslate('ja', 'vi', token.surface_form).then((res) => {
