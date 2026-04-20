@@ -60,7 +60,11 @@
 国内外;kokuꜛnaigai
 片付け;kataꜛzuke
 話;HÀNASHI
+人;HITÔ
+お話;ỒHÀNASHI
 話し;HÀNASHI
+考え;KĂNGGAÊ
+者;SHẠ
 で;DE
 も;MO
 が;GA
@@ -91,6 +95,7 @@
 ます;MÁS
 ござい;GỒZAI
 から;KÀRÀ
+ながら;NAGÀRÀ
 まで;MAĐẾ
 もの;MÔNÔ
 こと;KÔTÔ
@@ -177,6 +182,7 @@
 時;TÔKI
 思い;ÔMÔI
 思って;ÔMỐT
+思っ;ÔMỐ'
 ある;ARỰ
 いただい;ITAĐAI
 いただく;ÌTAĐAKỰ
@@ -190,5 +196,6 @@
 いたし;ÌTASHI
 ください;KƯĐASAI
 くれる;KỪRÊRỰ
+くれ;KƯRÊ
 くださっ;KƯĐASÁT
 くださる;KƯĐASARỰ
