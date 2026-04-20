@@ -535,12 +535,13 @@
                     addJapaneseTokenToStorage(pitchAccentCache[token.surface_form]);
                 }
                 const nextWord = ((tokens[i + 1] || {}).surface_form || '');
+                const baseCase = pitchAccentCache[token.surface_form] || japanese.romanize(
+                    includesKana(token.pronunciation) ? token.pronunciation : token.surface_form
+                );
                 if ((specialCaseKeys.includes(token.surface_form) && (nextWord.startsWith('ん')) || nextWord.startsWith('っ')) || (token.surface_form === 'さ' && ['れ', 'せ', 'れる'].includes(nextWord))) {
-                    rt.textContent = specialCases[token.surface_form];
+                    rt.textContent = specialCases[token.surface_form] || baseCase;
                 } else {
-                    rt.textContent = pitchAccentCache[token.surface_form] || japanese.romanize(
-                        includesKana(token.pronunciation) ? token.pronunciation : token.surface_form
-                    );
+                    rt.textContent = baseCase;
                 }
                 dom.appendChild(rt);
             } else {
