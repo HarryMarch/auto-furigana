@@ -133,6 +133,7 @@
                 animation: toast-in 0.25s ease forwards;
             }
 
+            .toast.hidden    { display: none; }
             .toast.success   { background: #4caf50; }
             .toast.error     { background: #f44336; }
             .toast.info      { background: #2196f3; }
@@ -237,6 +238,42 @@
             container.className = "toast-container";
 
             document.body.appendChild(container);
+            function extractRubyBase(html) {
+                const container = document.createElement("div");
+                container.innerHTML = html;
+
+                let result = "";
+
+                container.childNodes.forEach(node => {
+                    if (node.nodeName === "RUBY") {
+                        // get only text nodes (exclude <rt>)
+                        node.childNodes.forEach(child => {
+                            if (child.nodeType === Node.TEXT_NODE) {
+                                result += child.textContent;
+                            }
+                        });
+                    }
+                });
+
+                return result;
+            }
+            document.addEventListener("click", async function (e) {
+                const el = e.target.closest(".toast");
+                if (!el) return;
+
+                try {
+                    e.target.classList.add("hidden");
+                    const content = extractRubyBase(el.innerHTML);
+                    await navigator.clipboard.writeText(content);
+                    console.log("Copied:", content);
+
+                    // optional: hide after copy
+                    // el.classList.add("hidden");
+
+                } catch (err) {
+                    console.error("Copy failed:", err);
+                }
+            });
         }
         // 
         if (enableInsertRomaji) {
