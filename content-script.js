@@ -381,6 +381,22 @@
         return matches && matches.length === word.length && word.length === 2;
     }
 
+    function isJapaneseAdverb(word) {
+        if (typeof word !== "string") return false;
+
+        // Normalize to handle full-width / half-width consistently
+        const w = word.trim();
+
+        // Pattern 1: repetition like ゴロゴロ / ごちゃごちゃ
+        // Matches 2+ characters repeated twice
+        const repetitionPattern = /^(.{1,3})\1$/;
+
+        // Pattern 2: small tsu (っ or ッ) as second character
+        const smallTsuPattern = /^.([っッ]).+/;
+
+        return repetitionPattern.test(w) || smallTsuPattern.test(w);
+    }
+
     const toastQueue = [];
     let isProcessing = false;
 
@@ -533,8 +549,9 @@
             const isCaption = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
             const isWhiteListed = (isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form));
             const isBlackListed = BLACK_LISTED_WORDS.has(token.basic_form);
+            const isAdverb = isJapaneseAdverb(token.surface_form);
             const willShowToast = isCaption && (isWhiteListed
-                || isBlackListed);
+                || isBlackListed || isAdverb);
             const highlightClass = highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
             if (willShowToast) {
                 googleTranslate('ja', isWhiteListed ? 'vi' : 'en', token.surface_form).then((meaning) => {
