@@ -24,7 +24,17 @@ async function loadCache() {
     }
 }
 
-async function addWordIfNew(word) {
+// 🔍 Helper: check exactly 2 kanji
+function isTwoKanji(word) {
+    const kanjiRegex = /[\u4E00-\u9FFF]/g;
+    const matches = word.match(kanjiRegex);
+    return matches && matches.length === 2 && word.length === 2;
+}
+
+async function willAddWord(word) {
+    if (word.length === 1 || (word.length === 2 && !isTwoKanji(word))) {
+        return false;
+    }
     await loadCache();
 
     if (sheetsCache[word]) {
@@ -143,7 +153,7 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 const meaning = formatGoogleTranslateResult(json);
                 const params = new URL(message.content).searchParams;
                 const word = decodeURIComponent(params.get('q'));
-                addWordIfNew(word).then(isNew => {
+                willAddWord(word).then(isNew => {
                     if (isNew) {
                         console.log("New word added:", word);
                         appendRow([word, meaning]);
@@ -246,13 +256,6 @@ async function fetchJisho(kanji) {
         console.error(err);
     }
 };
-
-// 🔍 Helper: check exactly 2 kanji
-function isTwoKanji(word) {
-    const kanjiRegex = /[\u4E00-\u9FFF]/g;
-    const matches = word.match(kanjiRegex);
-    return matches && matches.length === 2 && word.length === 2;
-}
 
 function showRandomKanjiNotification() {
     chrome.storage.local.get(['kanjiCache'], function (result) {

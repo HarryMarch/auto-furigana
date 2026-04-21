@@ -37,7 +37,7 @@
     const BLACK_LISTED_WORDS = new Set([
         '映る', '', '', '', '', '',
         '収まる', '', '', '', '', '',
-        '', '', '', '', '', '',
+        'じっくり', '', '', '', '', '',
         '', '', '', '', '', '',
         '', '', '', '', '', '',
         '', '', '', '', '', '',
@@ -531,8 +531,8 @@
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
             const isCaption = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
-            const isWhiteListed = (isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form))
-            const isBlackListed = BLACK_LISTED_WORDS.has(token.surface_form);
+            const isWhiteListed = (isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form));
+            const isBlackListed = BLACK_LISTED_WORDS.has(token.basic_form);
             const willShowToast = isCaption && (isWhiteListed
                 || isBlackListed);
             const highlightClass = highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
