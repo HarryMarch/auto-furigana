@@ -375,10 +375,10 @@
         return /^[\u30A0-\u30FF]+$/.test(word);
     }
 
-    function isTwoOrThreeKanji(word) {
+    function isTwoKanji(word) {
         const kanjiRegex = /[\u4E00-\u9FFF]/g;
         const matches = word.match(kanjiRegex);
-        return matches && matches.length === word.length && word.length > 1;
+        return matches && matches.length === word.length && word.length === 2;
     }
 
     const toastQueue = [];
@@ -531,7 +531,7 @@
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
             const isCaption = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
-            const isWhiteListed = (isTwoOrThreeKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form))
+            const isWhiteListed = (isTwoKanji(token.surface_form) && !WHITE_LISTED_KANJI.has(token.surface_form))
             const isBlackListed = BLACK_LISTED_WORDS.has(token.surface_form);
             const willShowToast = isCaption && (isWhiteListed
                 || isBlackListed);
