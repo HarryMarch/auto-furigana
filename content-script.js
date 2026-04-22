@@ -383,6 +383,7 @@
 
     function isJapaneseAdverb(word) {
         if (typeof word !== "string") return false;
+        if (word.length < 4 || word.length > 6) return false;
 
         // Normalize to handle full-width / half-width consistently
         const w = word.trim();
