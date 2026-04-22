@@ -238,6 +238,10 @@
                 font-size: 3rem;
                 line-height: 4.5rem;
             }
+
+            [id^="youTube_transcript_item_"] {
+                line-height: 1.6em !important;
+            }
         `;
         document.head.appendChild(style);
         if (window.location.hostname.includes("tiktok.com")) {
