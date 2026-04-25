@@ -19,7 +19,9 @@ let sheetsCache = null;
 
 async function loadCache() {
     if (!sheetsCache) {
-        const data = await chrome.storage.local.get("sheets");
+        const data = await new Promise(function (resolve) {
+            chrome.storage.local.get("words", resolve);
+        });
         sheetsCache = data.words || {};
     }
 }
