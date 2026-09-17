@@ -51,7 +51,7 @@
         '', '', '', '', '', '',
     ]);
 
-    const COMMON_VERBS = new Set(['食べ', '行っ', '言っ', '思っ', '思う', '思い', '言わ', '言う', '言え', '行か', '行こ', '見え', '見える', '見せる', '見る', '見よ', '見れ', '答え', '使い', '飲ん', '切り', '分かっ', '忘れ', '待っ', '持っ', '来る', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+    const COMMON_VERBS = new Set(['食べ', '行っ', '言っ', '思っ', '思う', '思い', '言わ', '言う', '言え', '行か', '行こ', '見え', '見える', '見せる', '見る', '見よ', '見れ', '答え', '使い', '飲ん', '切り', '分かっ', '忘れ', '待っ', '持っ', '来る', '教え', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
         '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
         '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
         '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
@@ -413,61 +413,113 @@
         return repetitionPattern.test(w) || smallTsuPattern.test(w);
     }
 
-    const toastQueue = [];
-    let isProcessing = false;
+    // ============== ordered toast queue ==============
+    const orderedToastQueue = [];
+    let nextToastIndex = 0;
 
     // Track active (visible) toasts
     const activeToasts = new Set();
 
-    function showToast(message, type = "info", duration = 2500) {
+    /**
+     * Reserve a position in the toast sequence.
+     * The position is assigned before translation starts.
+     */
+    function reserveToastSlot() {
+        const index = orderedToastQueue.length;
+
+        orderedToastQueue.push({
+            status: 'pending',
+            message: null,
+            type: null,
+            duration: 2500,
+            key: null
+        });
+
+        return index;
+    }
+
+    /**
+     * Complete a reserved slot.
+     *
+     * Even if translation fails or produces no toast,
+     * the slot is marked completed so later toasts
+     * are not blocked forever.
+     */
+    function completeToastSlot(index, message, type = 'info', duration = 2500) {
+        const slot = orderedToastQueue[index];
+
+        if (!slot || slot.status !== 'pending') {
+            return;
+        }
+
+        const key = `${type}|${message}`;
+
+        // Skip duplicate toasts.
+        const duplicate = orderedToastQueue.some((t, i) =>
+            i !== index &&
+            t.status === 'completed' &&
+            t.key === key
+        ) || activeToasts.has(key);
+
+        if (duplicate) {
+            slot.status = 'skipped';
+        } else {
+            slot.status = 'completed';
+            slot.message = message;
+            slot.type = type;
+            slot.duration = duration;
+            slot.key = key;
+        }
+
+        processOrderedToasts();
+    }
+
+    /**
+     * Process completed translations in their original order.
+     *
+     * A later translation cannot overtake an earlier one.
+     * If the next slot is still pending, processing pauses.
+     */
+    function processOrderedToasts() {
+        while (nextToastIndex < orderedToastQueue.length) {
+            const slot = orderedToastQueue[nextToastIndex];
+
+            if (slot.status === 'pending') {
+                return;
+            }
+
+            nextToastIndex++;
+
+            if (slot.status === 'skipped') {
+                continue;
+            }
+
+            showToastElement(slot);
+        }
+    }
+
+    function showToastElement({ message, type, duration, key }) {
         const container = document.getElementById("toast-container");
+
         if (!container) {
             return;
         }
-        const key = `${type}|${message}`;
-
-        // ❌ Skip if already queued
-        const existsInQueue = toastQueue.some(t => `${t.type}|${t.message}` === key);
-
-        // ❌ Skip if already visible
-        if (existsInQueue || activeToasts.has(key)) {
-            return;
-        }
-
-        toastQueue.push({ message, type, duration, key });
-        processQueue();
-    }
-
-    function processQueue() {
-        if (isProcessing) return;
-        if (toastQueue.length === 0) return;
-
-        isProcessing = true;
-
-        const { message, type, duration, key } = toastQueue.shift();
-        const container = document.getElementById("toast-container");
 
         const toast = document.createElement("div");
         toast.className = `toast ${type}`;
         toast.innerHTML = message;
 
         container.appendChild(toast);
-
-        // Mark as active
         activeToasts.add(key);
 
-        // Lifetime (FIFO behavior preserved)
         setTimeout(() => {
             toast.classList.add("hide");
 
             setTimeout(() => {
                 toast.remove();
-                activeToasts.delete(key); // ✅ allow future duplicates again
+                activeToasts.delete(key);
             }, 250);
         }, duration);
-
-        isProcessing = false;
-        processQueue();
     }
 
     function includesJapanese(text) {
@@ -571,18 +623,43 @@
                 || isBlackListed || isAdverb || isVerb);
             const highlightClass = highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
             if (willShowToast) {
-                googleTranslate('ja', isWhiteListed ? 'vi' : 'en', token.surface_form).then((meaning) => {
-                    const pronunciation = token.pronunciation ? japanese.romanize(token.pronunciation).toLowerCase() : '';
-                    if (meaning.toLowerCase() !== pronunciation) {
-                        showToast(token.surface_form + '<br>' + meaning, highlightClass);
-                    }
-                });
+                // Reserve the original position BEFORE starting translation.
+                const toastIndex = reserveToastSlot();
+
+                const targetLang = isWhiteListed ? 'vi' : 'en';
+                const word = token.surface_form;
+                const pronunciation = token.pronunciation
+                    ? japanese.romanize(token.pronunciation).toLowerCase()
+                    : '';
+
+                googleTranslate('ja', targetLang, word)
+                    .then((meaning) => {
+                        // Handle an empty or invalid translation.
+                        if (typeof meaning !== 'string' || !meaning.trim()) {
+                            completeToastSlot(toastIndex, null);
+                            return;
+                        }
+
+                        // Preserve your original behavior:
+                        // do not show a toast when translation equals pronunciation.
+                        if (meaning.toLowerCase() === pronunciation) {
+                            completeToastSlot(toastIndex, null);
+                            return;
+                        }
+
+                        completeToastSlot(
+                            toastIndex,
+                            word + '<br>' + meaning,
+                            highlightClass
+                        );
+                    })
+                    .catch((error) => {
+                        console.error('Translation failed:', word, error);
+
+                        // Release this position even if the request fails.
+                        completeToastSlot(toastIndex, null);
+                    });
             }
-            // if (willShowToast && isKatakana(token.surface_form)) {
-            //     googleTranslate('ja', 'en', token.surface_form).then((res) => {
-            //         showToast(token.surface_form + '<br>' + formatGoogleTranslateResult(res));
-            //     });
-            // }
 
             let dom;
             if (includesKana(token.pronunciation) || includesJapanese(token.surface_form)) {
