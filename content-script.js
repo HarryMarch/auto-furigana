@@ -134,8 +134,8 @@
         style.textContent = `
             .toast-container {
                 position: fixed;
-                top: 20px;
-                right: 60px;
+                top: 10px;
+                right: 10px;
                 z-index: 9999;
                 display: flex;
                 flex-direction: column;
@@ -143,11 +143,11 @@
             }
 
             .toast {
-                width: 420px;
+                max-width: 300px;
                 padding: 12px 16px;
                 border-radius: 8px;
                 color: #fff;
-                font-size: 32px;
+                font-size: 34px;
                 line-height: 1.4;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 
