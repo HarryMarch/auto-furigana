@@ -143,7 +143,7 @@
             }
 
             .toast {
-                max-width: 300px;
+                width: 360px;
                 padding: 12px 16px;
                 border-radius: 8px;
                 color: #fff;
