@@ -4,7 +4,7 @@
     let enableInsertRomaji = true;
     let pitchAccentCache = {};
     let kanjiCache = {};
-    const highlightClasses = ['success' /* green */, 'error' /* red */, 'info' /* blue */, 'warning' /* orange */, 'highlight' /* yellow */];
+    const highlightClasses = ['success' /* green */, 'info' /* blue */, 'warning' /* orange */, 'highlight' /* yellow */];
 
     const excludeTags = new Set(['ruby', 'rt', 'script', 'select', 'option', 'textarea']);
     const COMMON_WORDS = new Set(['学校', '学生', '先生', '勉強', '日本', '英語',
@@ -615,7 +615,7 @@
             const isVerb = token.pos === "動詞" && token.surface_form.length > 1;
             const willShowToast = isCaption && (isWhiteListedNoun
                 || isBlackListed || isAdverb || isVerb) && !COMMON_WORDS.has(token.surface_form);
-            const highlightClass = highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
+            const highlightClass = isVerb ? 'error' : highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
             if (willShowToast) {
                 // Reserve the original position BEFORE starting translation.
                 const toastIndex = reserveToastSlot();
