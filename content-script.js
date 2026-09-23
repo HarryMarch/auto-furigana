@@ -4,7 +4,7 @@
     let enableInsertRomaji = true;
     let pitchAccentCache = {};
     let kanjiCache = {};
-    const highlightClasses = ['success' /* green */, 'info' /* blue */, 'warning' /* orange */, 'highlight' /* yellow */];
+    const highlightClasses = ['success' /* green */, 'info' /* blue */, 'warning' /* orange */, 'highlight' /* yellow */, 'random1', 'random2'];
 
     const excludeTags = new Set(['ruby', 'rt', 'script', 'select', 'option', 'textarea']);
     const COMMON_WORDS = new Set(['学校', '学生', '先生', '勉強', '日本', '英語',
@@ -65,7 +65,7 @@
         '不審': 'Hoài nghi, nghi ngờ',
         '審議': 'Cân nhắc, xem xét',
         '査証': 'Thị thực, visa',
-        '証拠': 'Bằng chứng, chứng cứ',
+        '証拠': 'Chứng cứ, bằng chứng',
         '証明': 'Chứng minh',
         '保証': 'Bảo đảm, cam kết',
         '貼付': 'Dán, dính vào, gắn vào',
@@ -86,6 +86,7 @@
         '猟銃': 'Súng săn',
         '狩猟': 'Sự đi săn',
         '刀剣': 'Đao kiếm',
+        '真剣': 'Nghiêm trang, đúng đắn',
         '検疫': 'Kiểm dịch',
         '免疫': 'Miễn dịch',
         '刑罰': 'Hình phạt',
@@ -407,7 +408,59 @@
         '文献': 'Văn kiện',
         '貢献': 'Cống hiến; đóng góp',
         '献立': 'Thực đơn; menu',
-        '委託': 'Sự ủy thác; sự nhờ làm'
+        '委託': 'Sự ủy thác; sự nhờ làm',
+        '宮殿': 'Cung điện, bảo điện',
+        '洋梨': 'Quả lê phương Tây',
+        '多岐': 'Lạc đề (nói và viết), thác nước',
+        '良心': 'Lương tâm',
+        '良質': 'Bản chất tốt',
+        '改良': 'Cải thiện, cải tiến',
+        '道徳': 'Đạo đức',
+        '佐渡': '',
+        '淡水': 'Nước ngọt',
+        '冷淡': 'Thờ ơ, dửng dưng',
+        '浜辺': 'Bãi biển, bờ biển',
+        '制覇': 'Chinh phục',
+        '連覇': 'Giành chiến thắng liên tiếp',
+        '世紀': 'Thế kỷ',
+        '稲光': 'Tia chớp',
+        '稲作': 'Trồng lúa',
+        '稲穂': 'Bông lúa',
+        '古墳': 'Mộ cổ',
+        '聖書': 'Kinh Thánh',
+        '神聖': 'Linh thiêng, thiêng liêng',
+        '憲法': 'Hiến pháp',
+        '派遣': 'Phái đi',
+        '立派': 'Có dáng, đàng hoàng, hào hoa, rạng rỡ',
+        '派手': 'Bảnh, màu mè, lòe loẹt',
+        '遷都': 'Sự dời đô',
+        '変遷': 'Sự thăng trầm',
+        '資源': 'Tài nguyên',
+        '起原': 'Nguồn gốc; khởi nguyên',
+        '財源': 'Ngân quỹ, nguồn tài chính',
+        '語源': 'Nguồn gốc của từ; từ nguyên',
+        '佐藤': 'Tên riêng của người Nhật',
+        '加藤': 'Tên riêng của người Nhật',
+        '摂政': 'Quan nhiếp chính; chức vụ quan nhiếp chính',
+        '摂取': 'Hấp thụ; hấp thu',
+        '摂氏': 'Thang chia nhiệt độ Celsius',
+        '倉庫': 'Kho hàng, kho; nhà kho',
+        '征服': 'Sự chinh phục; chinh phục, xâm chiếm',
+        '幕府': 'Mạc phủ',
+        '絶滅': 'Hủy diệt, tiêu trừ, triệt hạ',
+        '滅亡': 'Diệt vong',
+        '漂着': 'Dạt vào',
+        '鎖国': 'Bế quan tỏa cảng, biệt lập',
+        '連鎖': 'Dây xích, hệ thống, chuỗi',
+        '封鎖': 'Phong tỏa',
+        '閉鎖': 'Phong bế; phong tỏa, đóng cửa',
+        '根拠': 'Căn cứ',
+        '拠点': 'Cứ điểm',
+        '奉仕': 'Phụng sự',
+        '還元': 'Hoàn nguyên (hóa học); hoàn trả (thuế, lợi ích)',
+        '返還': 'Trở về; hoàn trả; trả lại',
+        '帝国': 'Đế quốc, vương quốc',
+        '昭和': 'Thời kỳ Chiêu Hòa'
     }
 
     // ============== observe ==============
@@ -514,6 +567,8 @@
             .toast.error     { background: #f44336; }
             .toast.info      { background: #2196f3; }
             .toast.warning   { background: #ff9800; }
+            .toast.random1   { background: #ff00d0; }
+            .toast.random2   { background: #00ddff; color: #000; }
             .toast.highlight { background: #f2ff00; color: #000; }
 
             .toast.hide {
