@@ -27,11 +27,11 @@ ruby.chrome-ext-furigana:hover rt {
     display: inline-block;
 }
 
-.ytwTranscriptSegmentViewModelHostActive > span.yt-core-attributed-string ruby.chrome-ext-furigana {
+.ytwTranscriptSegmentViewModelHostActive>span.yt-core-attributed-string ruby.chrome-ext-furigana {
     font-size: 0.5rem !important;
 }
 
-.ytwTranscriptSegmentViewModelHostActive > span.yt-core-attributed-string ruby.chrome-ext-furigana > rt {
+.ytwTranscriptSegmentViewModelHostActive>span.yt-core-attributed-string ruby.chrome-ext-furigana>rt {
     font-size: 2.5rem !important;
 }
 
@@ -53,4 +53,12 @@ ruby.chrome-ext-furigana:hover rt {
 
 .color-highlight {
     color: #f2ff00 !important;
+}
+
+.color-random1 {
+    color: #ff00d0 !important;
+}
+
+.color-random2 {
+    color: #00ddff !important;
 }
