@@ -568,8 +568,8 @@
             .toast.info      { background: #2196f3; }
             .toast.warning   { background: #ff9800; }
             .toast.random1   { background: #ff00d0; }
-            .toast.random2   { background: #00ddff; color: #000; }
-            .toast.highlight { background: #f2ff00; color: #000; }
+            .toast.random2   { background: #00ddff; }
+            .toast.highlight { background: #f2ff00; }
 
             .toast.hide {
                 animation: toast-out 0.25s ease forwards;
