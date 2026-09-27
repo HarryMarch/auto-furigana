@@ -53,6 +53,7 @@ ruby.chrome-ext-furigana:hover rt {
 
 .color-highlight {
     color: #ddff00 !important;
+    color-scheme: only light;
 }
 
 .color-random1 {
