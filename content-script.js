@@ -640,7 +640,7 @@
             .toast.warning   { background: #ff9800; }
             .toast.random1   { background: #ff00d0; }
             .toast.random2   { background: #00ddff; }
-            .toast.highlight { background: #ddff00; }
+            .toast.highlight { background: #ddff00 !important; color-scheme: light only; }
 
             .toast.hide {
                 animation: toast-out 0.25s ease forwards;
