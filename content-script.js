@@ -704,7 +704,7 @@
         style.textContent = `
             .toast-container {
                 position: fixed;
-                top: 10px;
+                top: ${window.location.hostname.includes('youtube.com') ? '300px' : '10px'};
                 right: 10px;
                 z-index: 9999;
                 display: flex;
