@@ -1337,6 +1337,10 @@
 
                 const nghia = KANJIS[word];
                 if (nghia) {
+                    chrome.runtime.sendMessage({
+                        type: 'save-translated-word',
+                        content: { word, meaning: nghia }
+                    });
                     completeToastSlot(
                         toastIndex,
                         word + '<br>' + nghia,
@@ -1387,6 +1391,11 @@
                                 .replace('danh từ ', '')
                                 .replace('trạng từ ', '')
                                 .replace('động từ ', '');
+
+                            chrome.runtime.sendMessage({
+                                type: 'save-translated-word',
+                                content: { word, meaning }
+                            });
 
                             const TOO_LONG = 50;
 

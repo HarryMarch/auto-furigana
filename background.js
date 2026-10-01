@@ -165,6 +165,19 @@ chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 sendResponse(meaning);
             }));
             return true;
+        case 'save-translated-word': {
+            const { word, meaning } = message.content || {};
+            if (typeof word === 'string' && word.trim() && typeof meaning === 'string' && meaning.trim()) {
+                translatedWordsWrite = translatedWordsWrite.then(() => new Promise(resolve => {
+                    chrome.storage.local.get('translatedWords', function (result) {
+                        const translatedWords = Object.assign({}, result.translatedWords || {});
+                        translatedWords[word] = meaning;
+                        chrome.storage.local.set({ translatedWords }, resolve);
+                    });
+                })).catch(error => console.error('Failed to save translated word:', error));
+            }
+        }
+            break;
     }
 });
 
@@ -409,3 +422,5 @@ chrome.runtime.onStartup.addListener(function () {
     clearAllExtensionNotifications();
     resetRandomKanjiNotifications();
 });
+
+let translatedWordsWrite = Promise.resolve();

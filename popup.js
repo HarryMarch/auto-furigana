@@ -115,6 +115,15 @@
                         }));
                         postMessage('flashcard-data', cards);
                     });
+                } else if (type === 'translations') {
+                    chrome.storage.local.get('translatedWords', function (result) {
+                        const cache = result.translatedWords || {};
+                        const cards = Object.keys(cache).map(key => ({
+                            front: key,
+                            back: cache[key]
+                        }));
+                        postMessage('flashcard-data', cards);
+                    });
                 }
             }
                 break;

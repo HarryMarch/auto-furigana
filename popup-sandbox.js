@@ -17,6 +17,7 @@ Vue.createApp({
         const autoNextEnabled = Vue.ref(false);
         let speakTimeoutId = null;
         let autoNextTimeoutId = null;
+        let translationSpeechToken = 0;
 
         // ==========================================
 
@@ -29,8 +30,9 @@ Vue.createApp({
 
         // ==========================================
 
-        function speakJapanese(text) {
+        function speakJapanese(text, onComplete = null) {
             if (!text || typeof speechSynthesis === 'undefined') {
+                if (onComplete) onComplete();
                 return;
             }
 
@@ -54,6 +56,19 @@ Vue.createApp({
                 utterance.voice = japaneseVoice;
             }
 
+            if (onComplete) {
+                let completed = false;
+                const complete = () => {
+                    if (completed) return;
+                    completed = true;
+                    clearTimeout(completionFallbackId);
+                    onComplete();
+                };
+                utterance.onend = complete;
+                utterance.onerror = complete;
+                const completionFallbackId = setTimeout(complete, 8000);
+            }
+
             speakTimeoutId = setTimeout(() => {
                 speechSynthesis.speak(utterance);
                 speakTimeoutId = null;
@@ -65,10 +80,22 @@ Vue.createApp({
             if (showFlashcards.value && flashcards.value.length > 0) {
                 const card = flashcards.value[currentCardIndex.value];
                 if (card && card.front) {
-                    speakJapanese(card.front);
+                    if (flashcardType.value !== 'translations') {
+                        speakJapanese(card.front);
+                    }
                 }
             }
         });
+
+        function playTranslationCard(card) {
+            isFlipped.value = false;
+            const token = ++translationSpeechToken;
+            speakJapanese(card.front, () => {
+                if (token === translationSpeechToken && showFlashcards.value) {
+                    isFlipped.value = true;
+                }
+            });
+        }
 
         // ==========================================
 
@@ -159,7 +186,9 @@ Vue.createApp({
                     // Play pronunciation of first card
                     if (data.length > 0) {
                         Vue.nextTick(() => {
-                            speakJapanese(data[0].front);
+                            if (flashcardType.value === 'translations') {
+                                playTranslationCard(data[0]);
+                            }
                         });
                     }
                 }
@@ -259,6 +288,7 @@ Vue.createApp({
                     document.body.focus();
                 });
             } else {
+                translationSpeechToken++;
                 stopAutoNext();
                 // Cancel speech when closing flashcards
                 if (speakTimeoutId) {
@@ -272,6 +302,13 @@ Vue.createApp({
         }
 
         function loadFlashcards() {
+            flashcards.value = [];
+            currentCardIndex.value = 0;
+            isFlipped.value = false;
+            translationSpeechToken++;
+            if (typeof speechSynthesis !== 'undefined') {
+                speechSynthesis.cancel();
+            }
             postMessage('get-flashcard-data', flashcardType.value);
         }
 
@@ -285,6 +322,9 @@ Vue.createApp({
                 currentCardIndex.value++;
                 isFlipped.value = false;
                 document.body.focus();
+                if (flashcardType.value === 'translations') {
+                    playTranslationCard(currentCard.value);
+                }
             }
         }
 
@@ -299,6 +339,9 @@ Vue.createApp({
             }
             isFlipped.value = false;
             document.body.focus();
+            if (flashcardType.value === 'translations') {
+                playTranslationCard(currentCard.value);
+            }
         }
 
         function previousCard() {
@@ -306,6 +349,9 @@ Vue.createApp({
                 currentCardIndex.value--;
                 isFlipped.value = false;
                 document.body.focus();
+                if (flashcardType.value === 'translations') {
+                    playTranslationCard(currentCard.value);
+                }
             }
         }
 
