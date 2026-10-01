@@ -55,8 +55,12 @@
                                 <div class="flashcard-hint">Click to flip</div>
                             </div>
                             <div v-if="flashcardType !== 'translations' || isFlipped" class="flashcard-back">
-                                <div v-if="flashcardType === 'translations'" class="flashcard-content">{{ currentCard.front }}</div>
-                                <div class="flashcard-content" v-html="currentCard.back"></div>
+                                <template v-if="flashcardType === 'translations'">
+                                    <div class="flashcard-content translation-word">{{ currentCard.front }}</div>
+                                    <div v-if="currentCard.pitchAccent" class="translation-pitch">{{ currentCard.pitchAccent }}</div>
+                                    <div class="flashcard-content" v-html="currentCard.back"></div>
+                                </template>
+                                <div v-else class="flashcard-content" v-html="currentCard.back"></div>
                             </div>
                         </div>
                     </div>
@@ -408,6 +412,20 @@
             font-size: 14px;
             line-height: 1.4;
             font-weight: normal;
+        }
+
+        .flashcard-back .translation-word {
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .translation-pitch {
+            margin-top: 4px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+            text-align: center;
+            overflow-wrap: anywhere;
         }
 
         .flashcard-hint {

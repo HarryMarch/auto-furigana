@@ -116,11 +116,13 @@
                         postMessage('flashcard-data', cards);
                     });
                 } else if (type === 'translations') {
-                    chrome.storage.local.get('translatedWords', function (result) {
-                        const cache = result.translatedWords || {};
-                        const cards = Object.keys(cache).map(key => ({
+                    chrome.storage.local.get(['translatedWords', 'pitchAccentCache', 'pitchAccentCacheAdditional'], function (result) {
+                        const translations = result.translatedWords || {};
+                        const pitchAccents = Object.assign({}, result.pitchAccentCache || {}, result.pitchAccentCacheAdditional || {});
+                        const cards = Object.keys(translations).map(key => ({
                             front: key,
-                            back: cache[key]
+                            back: translations[key],
+                            pitchAccent: pitchAccents[key] || ''
                         }));
                         postMessage('flashcard-data', cards);
                     });

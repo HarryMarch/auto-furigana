@@ -89,12 +89,8 @@ Vue.createApp({
 
         function playTranslationCard(card) {
             isFlipped.value = false;
-            const token = ++translationSpeechToken;
-            speakJapanese(card.front, () => {
-                if (token === translationSpeechToken && showFlashcards.value) {
-                    isFlipped.value = true;
-                }
-            });
+            translationSpeechToken++;
+            speakJapanese(card.front);
         }
 
         // ==========================================
