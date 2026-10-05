@@ -93,6 +93,10 @@ Vue.createApp({
             speakJapanese(card.front);
         }
 
+        function replayCurrentTranslation() {
+            speakJapanese(currentCard.value.front);
+        }
+
         // ==========================================
 
         function handleKeydown(e) {
@@ -580,6 +584,7 @@ Vue.createApp({
             toggleFlashcards,
             loadFlashcards,
             flipCard,
+            replayCurrentTranslation,
             nextCard,
             previousCard,
             shuffleCards,

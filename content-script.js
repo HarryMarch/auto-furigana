@@ -788,6 +788,15 @@
                 font-size: 3rem !important;
             }
 
+            #video-subtitle-panel ruby {
+                color: transparent;
+            }
+
+            #video-subtitle-panel ruby > rt {
+                color: red !important;
+                font-size: 1rem;
+            }
+
             [class^="css-"][class*="--DivMediaCardOverlay"] {
                 flex-direction: row-reverse !important;
             }

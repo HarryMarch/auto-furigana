@@ -56,6 +56,7 @@
                             </div>
                             <div v-if="flashcardType !== 'translations' || isFlipped" class="flashcard-back">
                                 <template v-if="flashcardType === 'translations'">
+                                    <button class="translation-replay" type="button" title="Replay pronunciation" @click.stop="replayCurrentTranslation">Replay sound</button>
                                     <div class="flashcard-content translation-word">{{ currentCard.front }}</div>
                                     <div v-if="currentCard.pitchAccent" class="translation-pitch">{{ currentCard.pitchAccent }}</div>
                                     <div class="flashcard-content" v-html="currentCard.back"></div>
@@ -417,6 +418,18 @@
         .flashcard-back .translation-word {
             font-size: 26px;
             font-weight: bold;
+        }
+
+        .translation-replay {
+            margin-bottom: 8px;
+            padding: 4px 9px;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            border-radius: 4px;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            font: inherit;
+            font-size: 12px;
         }
 
         .translation-pitch {
