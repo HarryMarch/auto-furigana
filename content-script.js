@@ -40,7 +40,7 @@
         '質問', '二つ', 'これから', 'すぐ', '信じ', '覚える', 'ご飯', '頑張り', 'なんで', '自己', 'もしかして', '分から',
         'お腹', '終わり', '頑張れ', '頑張ら', 'よっ', 'もっと', 'はね', '使う', 'ならん', 'おら', 'ください', 'かっこいい',
         'ぜひ', 'わかり', '内容', '読ん', '疲れ', '好き', '違う', 'しよ', '初めて', 'お金', 'こん', 'とても', 'れれ',
-        'いろいろ', 'いえ', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+        'いろいろ', 'いえ', 'まず', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
 
     const BLACK_LISTED_WORDS = new Set([
         '映る', '', '', '', '', '',
@@ -788,13 +788,22 @@
                 font-size: 3rem !important;
             }
 
-            #video-subtitle-panel ruby {
+            #video-current-sub ruby {
                 color: transparent;
+                font-size: 0.2rem;
             }
 
-            #video-subtitle-panel ruby > rt {
-                color: red !important;
-                font-size: 1rem;
+            #video-current-sub ruby > rt {
+                color: initial !important;
+                font-size: 1.2rem;
+            }
+
+            #video-current-sub .border-primary {
+                border: none !important;
+            }
+
+            #video-current-sub .py-1 {
+                padding: 0 !important;
             }
 
             [class^="css-"][class*="--DivMediaCardOverlay"] {
@@ -1244,6 +1253,7 @@
     const captionClassNames = [
         'DivVideoClosedCaption',
         'ytp-caption-segment',
+        'sub-text px-px border-b-2 border-primary'
     ];
     function scanDocument() {
         const stack = [document.body];
