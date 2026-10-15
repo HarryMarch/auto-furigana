@@ -15,7 +15,6 @@ Vue.createApp({
         const currentCardIndex = Vue.ref(0);
         const isFlipped = Vue.ref(false);
         const autoNextEnabled = Vue.ref(false);
-        let speakTimeoutId = null;
         let autoNextTimeoutId = null;
         let translationSpeechToken = 0;
 
@@ -34,11 +33,6 @@ Vue.createApp({
             if (!text || typeof speechSynthesis === 'undefined') {
                 if (onComplete) onComplete();
                 return;
-            }
-
-            if (speakTimeoutId) {
-                clearTimeout(speakTimeoutId);
-                speakTimeoutId = null;
             }
 
             // Cancel any ongoing speech
@@ -69,23 +63,8 @@ Vue.createApp({
                 const completionFallbackId = setTimeout(complete, 8000);
             }
 
-            speakTimeoutId = setTimeout(() => {
-                speechSynthesis.speak(utterance);
-                speakTimeoutId = null;
-            }, 1000);
+            speechSynthesis.speak(utterance);
         }
-
-        // Watch for card changes and play pronunciation
-        Vue.watch(currentCardIndex, () => {
-            if (showFlashcards.value && flashcards.value.length > 0) {
-                const card = flashcards.value[currentCardIndex.value];
-                if (card && card.front) {
-                    if (flashcardType.value !== 'translations') {
-                        speakJapanese(card.front);
-                    }
-                }
-            }
-        });
 
         function playTranslationCard(card) {
             isFlipped.value = false;
@@ -93,7 +72,7 @@ Vue.createApp({
             speakJapanese(card.front);
         }
 
-        function replayCurrentTranslation() {
+        function replayCurrentCard() {
             speakJapanese(currentCard.value.front);
         }
 
@@ -134,10 +113,6 @@ Vue.createApp({
         Vue.onUnmounted(() => {
             document.removeEventListener('keydown', handleKeydown, true);
             stopAutoNext();
-            if (speakTimeoutId) {
-                clearTimeout(speakTimeoutId);
-                speakTimeoutId = null;
-            }
             // Cancel any ongoing speech
             if (typeof speechSynthesis !== 'undefined') {
                 speechSynthesis.cancel();
@@ -291,10 +266,6 @@ Vue.createApp({
                 translationSpeechToken++;
                 stopAutoNext();
                 // Cancel speech when closing flashcards
-                if (speakTimeoutId) {
-                    clearTimeout(speakTimeoutId);
-                    speakTimeoutId = null;
-                }
                 if (typeof speechSynthesis !== 'undefined') {
                     speechSynthesis.cancel();
                 }
@@ -322,9 +293,7 @@ Vue.createApp({
                 currentCardIndex.value++;
                 isFlipped.value = false;
                 document.body.focus();
-                if (flashcardType.value === 'translations') {
-                    playTranslationCard(currentCard.value);
-                }
+                replayCurrentCard();
             }
         }
 
@@ -339,9 +308,7 @@ Vue.createApp({
             }
             isFlipped.value = false;
             document.body.focus();
-            if (flashcardType.value === 'translations') {
-                playTranslationCard(currentCard.value);
-            }
+            replayCurrentCard();
         }
 
         function previousCard() {
@@ -349,9 +316,7 @@ Vue.createApp({
                 currentCardIndex.value--;
                 isFlipped.value = false;
                 document.body.focus();
-                if (flashcardType.value === 'translations') {
-                    playTranslationCard(currentCard.value);
-                }
+                replayCurrentCard();
             }
         }
 
@@ -364,6 +329,7 @@ Vue.createApp({
             flashcards.value = shuffled;
             currentCardIndex.value = 0;
             isFlipped.value = false;
+            replayCurrentCard();
         }
 
         function startAutoNext() {
@@ -584,7 +550,7 @@ Vue.createApp({
             toggleFlashcards,
             loadFlashcards,
             flipCard,
-            replayCurrentTranslation,
+            replayCurrentCard,
             nextCard,
             previousCard,
             shuffleCards,
