@@ -15,6 +15,7 @@ Vue.createApp({
         const currentCardIndex = Vue.ref(0);
         const isFlipped = Vue.ref(false);
         const autoNextEnabled = Vue.ref(false);
+        let speakTimeoutId = null;
         let autoNextTimeoutId = null;
         let translationSpeechToken = 0;
 
@@ -33,6 +34,11 @@ Vue.createApp({
             if (!text || typeof speechSynthesis === 'undefined') {
                 if (onComplete) onComplete();
                 return;
+            }
+
+            if (speakTimeoutId) {
+                clearTimeout(speakTimeoutId);
+                speakTimeoutId = null;
             }
 
             // Cancel any ongoing speech
@@ -63,8 +69,20 @@ Vue.createApp({
                 const completionFallbackId = setTimeout(complete, 8000);
             }
 
-            speechSynthesis.speak(utterance);
+            speakTimeoutId = setTimeout(() => {
+                speechSynthesis.speak(utterance);
+                speakTimeoutId = null;
+            }, 1000);
         }
+
+        Vue.watch(currentCardIndex, () => {
+            if (showFlashcards.value && flashcards.value.length > 0 && flashcardType.value !== 'translations') {
+                const card = flashcards.value[currentCardIndex.value];
+                if (card && card.front) {
+                    speakJapanese(card.front);
+                }
+            }
+        });
 
         function playTranslationCard(card) {
             isFlipped.value = false;
@@ -113,6 +131,10 @@ Vue.createApp({
         Vue.onUnmounted(() => {
             document.removeEventListener('keydown', handleKeydown, true);
             stopAutoNext();
+            if (speakTimeoutId) {
+                clearTimeout(speakTimeoutId);
+                speakTimeoutId = null;
+            }
             // Cancel any ongoing speech
             if (typeof speechSynthesis !== 'undefined') {
                 speechSynthesis.cancel();
@@ -266,6 +288,10 @@ Vue.createApp({
                 translationSpeechToken++;
                 stopAutoNext();
                 // Cancel speech when closing flashcards
+                if (speakTimeoutId) {
+                    clearTimeout(speakTimeoutId);
+                    speakTimeoutId = null;
+                }
                 if (typeof speechSynthesis !== 'undefined') {
                     speechSynthesis.cancel();
                 }
@@ -293,7 +319,9 @@ Vue.createApp({
                 currentCardIndex.value++;
                 isFlipped.value = false;
                 document.body.focus();
-                replayCurrentCard();
+                if (flashcardType.value === 'translations') {
+                    playTranslationCard(currentCard.value);
+                }
             }
         }
 
@@ -308,7 +336,9 @@ Vue.createApp({
             }
             isFlipped.value = false;
             document.body.focus();
-            replayCurrentCard();
+            if (flashcardType.value === 'translations') {
+                playTranslationCard(currentCard.value);
+            }
         }
 
         function previousCard() {
@@ -316,7 +346,9 @@ Vue.createApp({
                 currentCardIndex.value--;
                 isFlipped.value = false;
                 document.body.focus();
-                replayCurrentCard();
+                if (flashcardType.value === 'translations') {
+                    playTranslationCard(currentCard.value);
+                }
             }
         }
 
@@ -329,7 +361,6 @@ Vue.createApp({
             flashcards.value = shuffled;
             currentCardIndex.value = 0;
             isFlipped.value = false;
-            replayCurrentCard();
         }
 
         function startAutoNext() {
