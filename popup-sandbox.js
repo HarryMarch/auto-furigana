@@ -72,7 +72,7 @@ Vue.createApp({
             speakTimeoutId = setTimeout(() => {
                 speechSynthesis.speak(utterance);
                 speakTimeoutId = null;
-            }, 1000);
+            }, 350);
         }
 
         Vue.watch(currentCardIndex, () => {
