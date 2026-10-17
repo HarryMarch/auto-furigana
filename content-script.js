@@ -1316,7 +1316,7 @@
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
             const isCaption = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
-            const isWhiteListedNoun = token.pos === "名詞" && token.surface_form.length === 2 && !/^[ぁ-んァ-ヶー]{2}$/.test(token.surface_form);
+            const isWhiteListedNoun = token.pos === "名詞" && token.surface_form.length >= 2 && !/^[ぁ-んァ-ヶー]{2}$/.test(token.surface_form);
             const isBlackListed = BLACK_LISTED_WORDS.has(token.basic_form);
             const isAdverb = isJapaneseAdverb(token.surface_form) || token.pos === "副詞";
             const isVerb = token.pos === "動詞" && token.surface_form.length > 1;
