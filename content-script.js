@@ -1321,7 +1321,7 @@
             const isAdverb = isJapaneseAdverb(token.surface_form) || token.pos === "副詞";
             const isVerb = token.pos === "動詞" && token.surface_form.length > 1;
             const willShowToast = isCaption && (isWhiteListedNoun
-                || isBlackListed || isAdverb || isVerb) && !COMMON_WORDS.has(token.surface_form);
+                || isBlackListed || isAdverb || isVerb) && !COMMON_WORDS.has(token.surface_form) && Number.isNaN(Number(token.surface_form));
             const highlightClass = isVerb ? 'error' : highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
             if (willShowToast) {
 
@@ -1347,8 +1347,8 @@
                 // Reserve the original position BEFORE starting translation.
                 const toastIndex = reserveToastSlot(toastGroup);
 
-                const targetLang = isWhiteListedNoun ? 'vi' : 'en';
                 const word = token.surface_form;
+                const targetLang = isWhiteListedNoun && !isKatakana(word) ? 'vi' : 'en';
 
                 const pronunciation = token.pronunciation
                     ? japanese.romanize(token.pronunciation).toLowerCase()
