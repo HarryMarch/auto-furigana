@@ -1320,6 +1320,7 @@
         for (let i = 0, len = tokens.length; i < len; ++i) {
             const token = tokens[i];
             const isCaption = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
+            const isSpecialCase = (node.parentNode || {}).className === 'mt-2 text-xl font-bold leading-tight text-gray-800 dark:text-white';
             const isWhiteListedNoun = token.pos === "名詞" && token.surface_form.length >= 2 && !/^[ぁ-んァ-ヶー]{2}$/.test(token.surface_form);
             const isBlackListed = BLACK_LISTED_WORDS.has(token.basic_form);
             const isAdverb = isJapaneseAdverb(token.surface_form) || token.pos === "副詞";
@@ -1327,7 +1328,7 @@
             const willShowToast = isCaption && (isWhiteListedNoun
                 || isBlackListed || isAdverb || isVerb) && !COMMON_WORDS.has(token.surface_form) && Number.isNaN(Number(token.surface_form));
             const highlightClass = isVerb ? 'error' : highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
-            if (willShowToast) {
+            if (willShowToast || isSpecialCase) {
 
                 /*
                  * Identify the current caption sentence.
