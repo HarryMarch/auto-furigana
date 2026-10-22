@@ -1359,7 +1359,21 @@
                     ? japanese.romanize(token.pronunciation).toLowerCase()
                     : '';
 
-                const nghia = KANJIS[word];
+                let nghia;
+                if (isSpecialCase) {
+                    const target = document.querySelector(
+                        'div.max-h-\\[450px\\].overflow-y-auto.px-3.pb-1'
+                    );
+
+                    const result = target
+                        ? [...target.querySelectorAll('.tiptap, .mt-2.text-sm p')]
+                            .map(el => el.innerText.trim())
+                            .join('\n')
+                        : '';
+                    nghia = result;
+                } else {
+                    nghia = KANJIS[word];
+                }
                 if (nghia) {
                     chrome.runtime.sendMessage({
                         type: 'save-translated-word',
