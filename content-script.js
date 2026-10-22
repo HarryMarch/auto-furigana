@@ -1328,7 +1328,27 @@
             const willShowToast = isCaption && (isWhiteListedNoun
                 || isBlackListed || isAdverb || isVerb) && !COMMON_WORDS.has(token.surface_form) && Number.isNaN(Number(token.surface_form));
             const highlightClass = isVerb ? 'error' : highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
-            if (willShowToast || isSpecialCase) {
+            if (isSpecialCase) {
+                const target = document.querySelector(
+                    'div.max-h-\\[450px\\].overflow-y-auto.px-3.pb-1'
+                );
+                const count = document.querySelector(
+                    'p.mt-2.text-xl.font-bold.leading-tight.text-gray-800.dark\\:text-white'
+                )?.children.length ?? 0;
+
+                const result = target
+                    ? [...target.querySelectorAll('.tiptap, .mt-2.text-sm p')]
+                        .map(el => el.innerText.trim())
+                        .join('\n')
+                    : '';
+                if (result && count < 2) {
+                    chrome.runtime.sendMessage({
+                        type: 'save-translated-word',
+                        content: { word: token.surface_form, meaning: result }
+                    })
+                };
+            }
+            if (willShowToast) {
 
                 /*
                  * Identify the current caption sentence.
@@ -1359,21 +1379,7 @@
                     ? japanese.romanize(token.pronunciation).toLowerCase()
                     : '';
 
-                let nghia;
-                if (isSpecialCase) {
-                    const target = document.querySelector(
-                        'div.max-h-\\[450px\\].overflow-y-auto.px-3.pb-1'
-                    );
-
-                    const result = target
-                        ? [...target.querySelectorAll('.tiptap, .mt-2.text-sm p')]
-                            .map(el => el.innerText.trim())
-                            .join('\n')
-                        : '';
-                    nghia = result;
-                } else {
-                    nghia = KANJIS[word];
-                }
+                const nghia = KANJIS[word];
                 if (nghia) {
                     chrome.runtime.sendMessage({
                         type: 'save-translated-word',
