@@ -1332,16 +1332,34 @@
                 const target = document.querySelector(
                     'div.max-h-\\[450px\\].overflow-y-auto.px-3.pb-1'
                 );
-                const count = document.querySelector(
-                    'p.mt-2.text-xl.font-bold.leading-tight.text-gray-800.dark\\:text-white'
-                )?.children.length ?? 0;
 
                 const result = target
                     ? [...target.querySelectorAll('.tiptap, .mt-2.text-sm p')]
                         .map(el => el.innerText.trim())
                         .join('\n')
                     : '';
-                if (result && count < 2) {
+
+                const p = document.querySelector(
+                    'p.mt-2.text-xl.font-bold.leading-tight.text-gray-800.dark\\:text-white'
+                );
+
+                const text = p
+                    ? [...p.childNodes].reduce((result, node) => {
+                        if (node.nodeType === Node.TEXT_NODE) {
+                            return result + node.textContent;
+                        }
+
+                        if (node.nodeType === Node.ELEMENT_NODE && node.tagName !== 'RT') {
+                            const clone = node.cloneNode(true);
+                            clone.querySelectorAll('rt').forEach(rt => rt.remove());
+                            return result + clone.textContent;
+                        }
+
+                        return result;
+                    }, '').trim()
+                    : '';
+
+                if (result && text) {
                     chrome.runtime.sendMessage({
                         type: 'save-translated-word',
                         content: { word: token.surface_form, meaning: result }
