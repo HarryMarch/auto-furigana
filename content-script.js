@@ -1362,7 +1362,7 @@
                 if (result && text) {
                     chrome.runtime.sendMessage({
                         type: 'save-translated-word',
-                        content: { word: token.surface_form, meaning: result }
+                        content: { word: text, meaning: result }
                     })
                 };
             }
