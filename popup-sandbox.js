@@ -10,7 +10,7 @@ Vue.createApp({
         const newWordInput = Vue.ref('');
         const newKanjiInput = Vue.ref('');
         const showFlashcards = Vue.ref(false);
-        const flashcardType = Vue.ref('kanji');
+        const flashcardType = Vue.ref('translations');
         const flashcards = Vue.ref([]);
         const currentCardIndex = Vue.ref(0);
         const isFlipped = Vue.ref(false);
