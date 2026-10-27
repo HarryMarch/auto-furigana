@@ -1642,7 +1642,7 @@
             }
 
             let meaning = await googleTranslate('ja', configs['targetLang'] || 'en', text);
-            await getYoutubeEmbedVideoInfo();
+            getYoutubeEmbedVideoInfo();
             meaning = meaning
                 .replace('tính từ ', '')
                 .replace('danh từ ', '')
