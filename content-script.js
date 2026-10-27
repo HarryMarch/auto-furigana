@@ -40,7 +40,7 @@
         '質問', '二つ', 'これから', 'すぐ', '信じ', '覚える', 'ご飯', '頑張り', 'なんで', '自己', 'もしかして', '分から',
         'お腹', '終わり', '頑張れ', '頑張ら', 'よっ', 'もっと', 'はね', '使う', 'ならん', 'おら', 'ください', 'かっこいい',
         'ぜひ', 'わかり', '内容', '読ん', '疲れ', '好き', '違う', 'しよ', '初めて', 'お金', 'こん', 'とても', 'れれ',
-        'いろいろ', 'いえ', 'まず', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+        'いろいろ', 'いえ', 'まず', '皆さん', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
 
     const BLACK_LISTED_WORDS = new Set([
         '映る', '', '', '', '', '',
@@ -788,6 +788,14 @@
                 color: beige;
             }
 
+            .subtitle-transcription {
+                font-size: 0.5px;
+            }
+
+            .subtitle-transcription rt {
+                font-size: 2rem !important;
+            }
+
             [class^="css-"][class*="--DivVideoClosedCaption"] > ruby > rt {
                 font-size: 3rem !important;
             }
@@ -1321,12 +1329,12 @@
             const token = tokens[i];
             const isCaption = node.parentNode && node.parentNode.className && captionClassNames.some(cls => node.parentNode.className.includes(cls));
             const isSpecialCase = (node.parentNode || {}).className === 'mt-2 text-xl font-bold leading-tight text-gray-800 dark:text-white';
-            const isWhiteListedNoun = token.pos === "名詞" && token.surface_form.length >= 2 && !/^[ぁ-んァ-ヶー]{2}$/.test(token.surface_form);
+            const isWhiteListedNoun = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]{2}$/.test(token.surface_form);
             const isBlackListed = BLACK_LISTED_WORDS.has(token.basic_form);
             const isAdverb = isJapaneseAdverb(token.surface_form) || token.pos === "副詞";
-            const isVerb = token.pos === "動詞" && token.surface_form.length > 1;
+            const isVerb = token.pos === "動詞";
             const isValid = (isWhiteListedNoun
-                || isBlackListed || isAdverb || isVerb) && !COMMON_WORDS.has(token.surface_form) && Number.isNaN(Number(token.surface_form));
+                || isBlackListed || isAdverb || isVerb) && !COMMON_WORDS.has(token.surface_form) && Number.isNaN(Number(token.surface_form)) && token.surface_form.length >= 2;
             const willShowToast = isCaption && isValid;
             const highlightClass = isVerb ? 'error' : highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
             if (isSpecialCase && isValid) {
@@ -1453,7 +1461,8 @@
                                 .replace('tính từ ', '')
                                 .replace('danh từ ', '')
                                 .replace('trạng từ ', '')
-                                .replace('động từ ', '');
+                                .replace('động từ ', '')
+                                .replace('đại từ ', '');
 
                             chrome.runtime.sendMessage({
                                 type: 'save-translated-word',
@@ -1583,13 +1592,27 @@
                 return;
             }
             const text = textNode.data || '';
-            const meaning = await googleTranslate('ja', configs['targetLang'] || 'en', text);
+            if (text.replace('っ', '').length < 2 || COMMON_WORDS.has(text)) {
+                return;
+            }
+            let meaning = await googleTranslate('ja', configs['targetLang'] || 'en', text);
+            meaning = meaning
+                .replace('tính từ ', '')
+                .replace('danh từ ', '')
+                .replace('trạng từ ', '')
+                .replace('động từ ', '')
+                .replace('đại từ ', '');
+            chrome.runtime.sendMessage({
+                type: 'save-translated-word',
+                content: { word: text, meaning }
+            });
             let kanjiInfo = '';
             text.split('').forEach(char => {
                 if (kanjiCache[char]) {
                     kanjiInfo += char + ': ' + kanjiCache[char] + '<br>';
                 }
             });
+            console.log('asda',meaning,text)
             if (meaning) {
                 translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + meaning;
             } else {

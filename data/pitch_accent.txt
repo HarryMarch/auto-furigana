@@ -38238,12 +38238,12 @@ JIS;ꜛjiꜜす
 食客;shoꜛっかく
 触感;shoꜛっかん
 食間;shoꜛっかん
-食器;shoꜛっき
-織機;shoꜛっき
+食器;shoꜛkki
+織機;shoꜛkki
 ジョッキ;ꜛjoꜜっき
 ジョッキー;ꜛjoꜜっきい
-食器棚;shoꜛっきꜜだな
-初っ切り;shoꜛっきり
+食器棚;shoꜛkkiꜜだな
+初っ切り;shoꜛkkiri
 ショッキング;ꜛshoꜜっきんぐ~
 ショック;ꜛshoꜜkku
 ショック死;shoꜛっku*ꜜし
