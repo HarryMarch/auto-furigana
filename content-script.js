@@ -1553,6 +1553,51 @@
         });
     }
 
+    function getYoutubeEmbedVideoInfo() {
+        const frame = Array.from(document.querySelectorAll('iframe')).find(iframe => {
+            try {
+                return new URL(iframe.src).pathname.startsWith('/embed/');
+            } catch {
+                return false;
+            }
+        });
+
+        if (!frame) {
+            return Promise.resolve(null);
+        }
+
+        const targetOrigin = new URL(frame.src).origin;
+        const requestId = `${Date.now()}-${Math.random()}`;
+
+        return new Promise(resolve => {
+            const timeout = setTimeout(() => {
+                window.removeEventListener('message', onMessage);
+                resolve(null);
+            }, 1000);
+
+            function onMessage(event) {
+                if (
+                    event.source !== frame.contentWindow ||
+                    event.origin !== targetOrigin ||
+                    event.data?.type !== 'auto-furigana:video-info' ||
+                    event.data.requestId !== requestId
+                ) {
+                    return;
+                }
+
+                clearTimeout(timeout);
+                window.removeEventListener('message', onMessage);
+                resolve(event.data.video);
+            }
+
+            window.addEventListener('message', onMessage);
+            frame.contentWindow.postMessage({
+                type: 'auto-furigana:pause-video-and-get-info',
+                requestId
+            }, targetOrigin);
+        });
+    }
+
     // ============== translation ==============
     const translationDom = document.createElement('div');
     translationDom.classList.add('chrome-ext-furigana-translation');
@@ -1595,7 +1640,9 @@
             if (text.replace('っ', '').length < 2 || COMMON_WORDS.has(text)) {
                 return;
             }
+
             let meaning = await googleTranslate('ja', configs['targetLang'] || 'en', text);
+            await getYoutubeEmbedVideoInfo();
             meaning = meaning
                 .replace('tính từ ', '')
                 .replace('danh từ ', '')
@@ -1612,7 +1659,7 @@
                     kanjiInfo += char + ': ' + kanjiCache[char] + '<br>';
                 }
             });
-            console.log('asda',meaning,text)
+
             if (meaning) {
                 translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + meaning;
             } else {

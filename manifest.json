@@ -12,6 +12,11 @@
       "css": [ "content-style.css" ],
       "js": [ "japanese.js/japanese.js", "kuromoji/kuromoji.js", "content-script.js" ],
       "matches": [ "\u003Call_urls>" ]
+   }, {
+      "all_frames": true,
+      "js": [ "youtube-embed-bridge.js" ],
+      "matches": [ "https://www.youtube.com/embed/*" ],
+      "run_at": "document_idle"
    } ],
    "description": "Auto insert romaji to Japanese.",
    "host_permissions": [ "https://clients5.google.com/", "https://sheets.googleapis.com/*" ],
