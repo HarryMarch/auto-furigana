@@ -1641,8 +1641,8 @@
                 return;
             }
 
-            let meaning = await googleTranslate('ja', configs['targetLang'] || 'en', text);
             getYoutubeEmbedVideoInfo();
+            let meaning = await googleTranslate('ja', configs['targetLang'] || 'en', text);
             meaning = meaning
                 .replace('tính từ ', '')
                 .replace('danh từ ', '')
