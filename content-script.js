@@ -857,6 +857,33 @@
             [id^="youTube_transcript_item_"] {
                 line-height: 1.6em !important;
             }
+
+            .live-room-container {
+                position: relative;
+            }
+
+            .live-room-container [data-e2e="gift-container"] {
+                display: none !important;
+            }
+
+            .live-room-container [data-e2e="public-screen-container"] {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100% !important;
+                height: 100%;
+                background: transparent;
+            }
+
+            .live-room-container [data-e2e="public-screen-container"] div {
+                background: transparent;
+                color: aqua;
+                font-size: 16px;
+            }
+
+            .live-room-container [data-e2e="live-chat-container"] > :nth-child(2) {
+                visibility: hidden !important;
+            }
         `;
         document.head.appendChild(style);
         if (window.location.hostname.includes("tiktok.com")) {
