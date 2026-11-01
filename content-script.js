@@ -893,6 +893,14 @@
                 visibility: hidden !important;
             }
 
+            .live-room-container [data-e2e="live-chat-container"] > :last-child > div > :first-child {
+                background: none !important;
+            }
+
+            .live-room-container [data-e2e="live-chat-container"] > :last-child > div > :nth-child(2) > div > div > .w-full > div > :nth-child(2) > :first-child {
+                visibility: hidden !important;
+            }
+
             .live-room-container [data-e2e="live-chat-container"] > :last-child > div > :last-child {
                 display: none !important;
             }
