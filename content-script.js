@@ -893,6 +893,10 @@
                 visibility: hidden !important;
             }
 
+            .live-room-container [data-e2e="live-chat-container"] > :last-child > div > > :last-child {
+                display: none !important;
+            }
+
             .live-room-container [data-e2e="public-screen-live-chat-slot"] > :last-child {
                 visibility: hidden !important;
             }
