@@ -862,6 +862,10 @@
                 position: relative;
             }
 
+            .live-room-container [data-e2e="live-content-container"] {
+                width: 100% !important;
+            }
+
             .live-room-container [data-e2e="gift-container"] {
                 display: none !important;
             }
@@ -878,9 +882,13 @@
             .live-room-container [data-e2e="public-screen-container"] div {
                 background: transparent;
                 color: aqua;
-                font-size: 16px;
+                font-size: 25px;
             }
 
+            .live-room-container [data-e2e="live-chat-container"] > :first-child {
+                height: 500px !important;
+            }
+            
             .live-room-container [data-e2e="live-chat-container"] > :nth-child(2) {
                 visibility: hidden !important;
             }
