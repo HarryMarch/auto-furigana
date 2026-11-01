@@ -893,7 +893,7 @@
                 visibility: hidden !important;
             }
 
-            .live-room-container [data-e2e="live-chat-container"] > :last-child > div > > :last-child {
+            .live-room-container [data-e2e="live-chat-container"] > :last-child > div > :last-child {
                 display: none !important;
             }
 
