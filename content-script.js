@@ -872,10 +872,10 @@
 
             .live-room-container [data-e2e="public-screen-container"] {
                 position: absolute;
-                bottom: 0;
+                top: 0;
                 left: 0;
                 width: 100% !important;
-                height: 100%;
+                height: calc(100% - 80px) !important;
                 background: transparent;
             }
 
@@ -890,6 +890,10 @@
             }
             
             .live-room-container [data-e2e="live-chat-container"] > :nth-child(2) {
+                visibility: hidden !important;
+            }
+
+            .live-room-container [data-e2e="public-screen-live-chat-slot"] > :last-child {
                 visibility: hidden !important;
             }
         `;
