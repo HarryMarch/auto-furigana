@@ -1713,6 +1713,8 @@
             if (text.replace('っ', '').length < 2 || COMMON_WORDS.has(text)) {
                 return;
             }
+            const parentText = node.parentElement?.cloneNode(true);
+            parentText?.querySelectorAll('rt').forEach(rt => rt.remove());
 
             getYoutubeEmbedVideoInfo();
             let meaning = await googleTranslate('ja', configs['targetLang'] || 'en', text);
@@ -1732,9 +1734,20 @@
                     kanjiInfo += char + ': ' + kanjiCache[char] + '<br>';
                 }
             });
+            const contextText = parentText?.innerText || '';
+            const escapeHtml = value => value.replace(/[&<>"']/g, char => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[char]);
+            const contextHtml = contextText
+                ? contextText.split(text).map(escapeHtml).join(`<strong style="color: red;">${escapeHtml(text)}</strong>`)
+                : '';
 
             if (meaning) {
-                translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + meaning;
+                translationDom.innerHTML = (kanjiInfo ? kanjiInfo + '<br>' : '') + meaning + (contextHtml ? '<br><br>' + contextHtml : '');
             } else {
                 return;
             }
