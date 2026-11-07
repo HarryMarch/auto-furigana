@@ -1402,7 +1402,7 @@
             const isWhiteListedNoun = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]{2}$/.test(token.surface_form);
             const isASingleKanji = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]$/.test(token.surface_form) && token.surface_form.length === 1
                 && i !== 0 && isTwoKanji(tokens[i - 1].surface_form) && pitchAccentCache[token.surface_form]
-                && pitchAccentCache[token.surface_form] !== pitchAccentCache[token.surface_form].toUpperCase();
+                && pitchAccentCache[token.surface_form][0].toUpperCase() !== japanese.romanize(token.pronunciation)[0].toUpperCase();
             const isBlackListed = BLACK_LISTED_WORDS.has(token.basic_form);
             const isAdverb = isJapaneseAdverb(token.surface_form) || token.pos === "副詞";
             const isVerb = token.pos === "動詞";
