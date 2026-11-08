@@ -61,6 +61,7 @@
 
     const KANJIS = {
         '審査': 'Thẩm tra, kiểm tra',
+        '文字': 'chữ cái; văn tự; con chữ',
         '処理': 'dealing, treatment, processing, disposition, disposal',
         '投稿': 'sự đóng góp; sự cộng tác; đăng',
         '対応': 'sự đối ứng',
