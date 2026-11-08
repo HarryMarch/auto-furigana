@@ -1401,8 +1401,8 @@
             const isSpecialCase = (node.parentNode || {}).className === 'mt-2 text-xl font-bold leading-tight text-gray-800 dark:text-white';
             const isWhiteListedNoun = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]{2}$/.test(token.surface_form);
             const isASingleKanji = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]$/.test(token.surface_form) && token.surface_form.length === 1
-                && i !== 0 && isTwoKanji(tokens[i - 1].surface_form) && pitchAccentCache[token.surface_form]
-                && pitchAccentCache[token.surface_form][0].toUpperCase() !== japanese.romanize(token.pronunciation)[0].toUpperCase();
+                && pitchAccentCache[token.surface_form] && pitchAccentCache[token.surface_form][0].toUpperCase() !== japanese.romanize(token.pronunciation)[0].toUpperCase();
+            const isNani = token.surface_form === 'なん' && pitchAccentCache[token.surface_form].at(-1) !== japanese.romanize(token.pronunciation).at(-1);
             const isBlackListed = BLACK_LISTED_WORDS.has(token.basic_form);
             const isAdverb = isJapaneseAdverb(token.surface_form) || token.pos === "副詞";
             const isVerb = token.pos === "動詞";
@@ -1587,7 +1587,8 @@
                     addJapaneseTokenToStorage(pitchAccentCache[token.surface_form]);
                 }
                 const nextWord = ((tokens[i + 1] || {}).surface_form || '');
-                const baseCase = (!isASingleKanji && pitchAccentCache[token.surface_form]) || japanese.romanize(
+                const needSwitch = isASingleKanji || isNani;
+                const baseCase = (!needSwitch && pitchAccentCache[token.surface_form]) || japanese.romanize(
                     includesKana(token.pronunciation) ? token.pronunciation : token.surface_form
                 );
                 if ((specialCaseKeys.includes(token.surface_form) && (nextWord.startsWith('ん')) || nextWord.startsWith('っ')) || (token.surface_form === 'さ' && ['れ', 'せ', 'れる'].includes(nextWord))) {
