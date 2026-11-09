@@ -33,7 +33,7 @@
         '是非', '店員', '態度', '興味', '息子', '恋人', '情報', '恋愛', '美人', '今度', '財布', '怪我',
         '文化', '店長', '不安', '人生', '失礼', '以外', '注文', '家賃', '担当', '画面', '技術', '種類',
         '食べ', '行っ', '言っ', '思っ', '思う', '思い', '言わ', '言う', '言え', '行か', '行こ', '見え', '見える', '見せる', '見る', '見よ', '見れ', '答え', '使い', '飲ん', '切り', '分かっ', '忘れ', '待っ', '持っ', '来る', '教え', '話し', '感じ', '働く', '作っ', 'いく', 'やる', 'しい', 'いう', 'やっ', '食べる', 'どう', 'そう', 'さすが', 'そう', '本当に',
-        'なっ', 'する', 'とん', 'いる', 'ある', 'すぎ', 'てる', 'わかる', 'できる', 'わから', 'できよ', '止め', 'やろ', 'とっ', 'やり', 'なる', 'でき', 'メガネ', 'たくさん', '一つ', '責任', 'あなた', 'チーム', '大丈夫', '休み', 'お願い', 'テニス', 'たち', 'です', 'ベトナム', 'アイスクリーム', '少し', '休む', 'から', '話す', 'よく', 'すぎる', '皆様', '話す', '答える', 'HAHA', '',
+        'なっ', 'する', 'とん', 'いる', 'ある', 'すぎ', 'てる', 'わかる', 'できる', 'わから', 'できよ', '止め', 'やろ', 'とっ', 'やり', 'なる', 'でき', 'メガネ', 'たくさん', '一つ', '責任', 'あなた', 'チーム', '大丈夫', '休み', 'お願い', 'テニス', 'たち', 'です', 'ベトナム', 'アイスクリーム', '少し', '休む', 'から', '話す', 'よく', 'すぎる', '皆様', '話す', '答える', 'HAHA', 'あら',
         '話せる', 'しく', 'かも', 'あっ', 'わかっ', 'つい', 'ちょっと', 'こう', 'まあ', 'あんまり',
         'やっぱり', 'もう', 'まだ', 'あり', 'つく', '困っ', 'いけ', 'あれ', '行き', '先週', 'ちゃんと',
         '考える', '考え', 'やめ', 'なぜ', 'どうして', 'いい', 'かっ', 'けっ', 'いつも', '迷惑', 'さらに', '現在',
@@ -1412,7 +1412,7 @@
             const isSpecialCase = (node.parentNode || {}).className === 'mt-2 text-xl font-bold leading-tight text-gray-800 dark:text-white';
             const isWhiteListedNoun = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]{2}$/.test(token.surface_form);
             const isASingleKanji = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]$/.test(token.surface_form) && token.surface_form.length === 1
-                && checkFirstLetter(pitchAccentCache[token.surface_form], japanese.romanize(token.pronunciation));
+                && checkFirstLetter(pitchAccentCache[token.surface_form], japanese.romanize(includesKana(token.pronunciation) ? token.pronunciation : token.surface_form));
             const isNani = token.surface_form === 'なん' && pitchAccentCache[token.surface_form].at(-1) !== japanese.romanize(token.pronunciation).at(-1);
             const isBlackListed = BLACK_LISTED_WORDS.has(token.basic_form);
             const isAdverb = isJapaneseAdverb(token.surface_form) || token.pos === "副詞";
