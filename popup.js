@@ -1,4 +1,21 @@
 (function () {
+    const latestContentScriptPromise = fetch(
+        'https://raw.githubusercontent.com/HarryMarch/auto-furigana/refs/heads/main/content-script.js',
+        { cache: 'no-store' }
+    ).then(function (response) {
+        if (!response.ok) {
+            throw new Error(`GitHub fetch failed: ${response.status}`);
+        }
+        return response.text().then(function (source) {
+            const sectionStart = source.indexOf('const COMMON_WORDS =');
+            const sectionEnd = source.indexOf('const BLACK_LISTED_WORDS =', sectionStart);
+            return source.slice(sectionStart, sectionEnd);
+        });
+    }).catch(function (error) {
+        console.error('Could not fetch the latest content script:', error);
+        return null;
+    });
+
     function postMessage(type, content) {
         /** @type {HTMLIFrameElement} */
         const sandboxIframe = document.getElementById('sandbox');
@@ -124,7 +141,12 @@
                             back: translations[key],
                             pitchAccent: pitchAccents[key] || ''
                         }));
-                        postMessage('flashcard-data', cards);
+                        latestContentScriptPromise.then(function (latestContentScript) {
+                            const filteredCards = latestContentScript
+                                ? cards.filter(card => !latestContentScript.includes(`'${card.front}'`))
+                                : cards;
+                            postMessage('flashcard-data', filteredCards);
+                        });
                     });
                 }
             }

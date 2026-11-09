@@ -1356,6 +1356,15 @@
         }
     }
 
+    function checkFirstLetter(fromCache, fromLibrary) {
+        const getFirstLetter = (str) => {
+            if (!str) return '';
+            const match = str.match(/[a-zA-Z]/);
+            return match ? match[0] : '';
+        }
+        return getFirstLetter(fromCache).toLowerCase() === getFirstLetter(fromLibrary);
+    }
+
     // ============== create ruby ==============
     const specialCases = {
         'た': 'TA',
@@ -1403,7 +1412,7 @@
             const isSpecialCase = (node.parentNode || {}).className === 'mt-2 text-xl font-bold leading-tight text-gray-800 dark:text-white';
             const isWhiteListedNoun = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]{2}$/.test(token.surface_form);
             const isASingleKanji = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]$/.test(token.surface_form) && token.surface_form.length === 1
-                && pitchAccentCache[token.surface_form] && pitchAccentCache[token.surface_form][0].toUpperCase() !== japanese.romanize(token.pronunciation)[0].toUpperCase();
+                && checkFirstLetter(pitchAccentCache[token.surface_form], japanese.romanize(token.pronunciation));
             const isNani = token.surface_form === 'なん' && pitchAccentCache[token.surface_form].at(-1) !== japanese.romanize(token.pronunciation).at(-1);
             const isBlackListed = BLACK_LISTED_WORDS.has(token.basic_form);
             const isAdverb = isJapaneseAdverb(token.surface_form) || token.pos === "副詞";
