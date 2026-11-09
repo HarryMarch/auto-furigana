@@ -143,7 +143,11 @@
                         }));
                         latestContentScriptPromise.then(function (latestContentScript) {
                             const filteredCards = latestContentScript
-                                ? cards.filter(card => !latestContentScript.includes(`'${card.front}'`))
+                                ? cards.filter(card => {
+                                    const inContentScript = !latestContentScript.includes(`'${card.front}'`);
+                                    if (!inContentScript) alert(`Filtering card: ${card.front} - In content script: ${inContentScript}`);
+                                    return inContentScript;
+                                })
                                 : cards;
                             postMessage('flashcard-data', filteredCards);
                         });
