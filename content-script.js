@@ -1778,6 +1778,7 @@
     });
 
     document.addEventListener('click', function (e) {
+        alert('click');
         const target = e.target;
         if (!(target instanceof Element) || typeof speechSynthesis === 'undefined') {
             return;
