@@ -40,7 +40,7 @@
         '質問', '二つ', 'これから', 'すぐ', '信じ', '覚える', 'ご飯', '頑張り', 'なんで', '自己', 'もしかして', '分から',
         'お腹', '終わり', '頑張れ', '頑張ら', 'よっ', 'もっと', 'はね', '使う', 'ならん', 'おら', 'ください', 'かっこいい',
         'ぜひ', 'わかり', '内容', '読ん', '疲れ', '好き', '違う', 'しよ', '初めて', 'お金', 'こん', 'とても', 'れれ',
-        'いろいろ', 'いえ', 'まず', '皆さん', 'ちゃん', 'OK', 'よろしく', '日本語', 'うっ', '食べ物', 'ああ', '日本人', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+        'いろいろ', 'いえ', 'まず', '皆さん', 'ちゃん', 'OK', 'よろしく', '日本語', 'うっ', '食べ物', 'ああ', '日本人', '白い', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
 
     const BLACK_LISTED_WORDS = new Set([
         '映る', '', '', '', '', '',
@@ -1364,7 +1364,7 @@
             const match = str.match(/[a-zA-Z]/);
             return match ? match[0] : '';
         }
-        return getFirstLetter(fromCache).toLowerCase() === getFirstLetter(fromLibrary);
+        return getFirstLetter(fromCache).toLowerCase() !== getFirstLetter(fromLibrary);
     }
 
     // ============== create ruby ==============
@@ -1414,13 +1414,15 @@
             const isSpecialCase = (node.parentNode || {}).className === 'mt-2 text-xl font-bold leading-tight text-gray-800 dark:text-white';
             const isWhiteListedNoun = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]{2}$/.test(token.surface_form);
             const isASingleKanji = token.pos === "名詞" && !/^[ぁ-んァ-ヶー]$/.test(token.surface_form) && token.surface_form.length === 1
+                && !['者', '島', '出', '次',].includes(token.surface_form)
                 && checkFirstLetter(pitchAccentCache[token.surface_form], japanese.romanize(includesKana(token.pronunciation) ? token.pronunciation : token.surface_form));
             const isNani = token.surface_form === 'なん' && pitchAccentCache[token.surface_form].at(-1) !== japanese.romanize(token.pronunciation).at(-1);
             const isBlackListed = BLACK_LISTED_WORDS.has(token.basic_form);
             const isAdverb = isJapaneseAdverb(token.surface_form) || token.pos === "副詞";
+            const isAdjective = token.pos === "形容詞" && token.surface_form.length >= 2 && kanjiRegexp.test(token.surface_form[0]);
             const isVerb = token.pos === "動詞";
             const isValid = (isWhiteListedNoun
-                || isBlackListed || isAdverb || isVerb) && !COMMON_WORDS.has(token.surface_form) && Number.isNaN(Number(token.surface_form)) && token.surface_form.length >= 2;
+                || isBlackListed || isAdverb || isVerb || isAdjective) && !COMMON_WORDS.has(token.surface_form) && Number.isNaN(Number(token.surface_form)) && token.surface_form.length >= 2;
             const willShowToast = isCaption && isValid;
             const highlightClass = isVerb ? 'error' : highlightClasses[Math.floor(Math.random() * highlightClasses.length)];
             if (isSpecialCase && isValid) {
