@@ -1778,8 +1778,6 @@
     });
 
     document.addEventListener('click', function (e) {
-        console.log('####### click event triggered #######');
-        alert('click');
         const target = e.target;
         if (!(target instanceof Element) || typeof speechSynthesis === 'undefined') {
             return;
@@ -1820,6 +1818,7 @@
         utterance.lang = 'en-US';
         const englishVoice = speechSynthesis.getVoices()
             .find(voice => voice.lang.toLowerCase().startsWith('en'));
+        console.log('####### click event triggered #######', speechSynthesis.getVoices());
         if (englishVoice) {
             utterance.voice = englishVoice;
         }
