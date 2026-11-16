@@ -1818,8 +1818,8 @@
         utterance.lang = 'en-US';
         const englishVoice = speechSynthesis.getVoices()
             .find(voice => voice.lang.toLowerCase().startsWith('en'));
-        console.log('####### click event triggered #######', speechSynthesis.getVoices());
         if (englishVoice) {
+            console.log('####### click event triggered #######', englishVoice);
             utterance.voice = englishVoice;
         }
         speechSynthesis.speak(utterance);
