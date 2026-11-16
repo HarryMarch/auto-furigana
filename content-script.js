@@ -1778,6 +1778,7 @@
     });
 
     document.addEventListener('click', function (e) {
+        console.log('####### click event triggered #######');
         alert('click');
         const target = e.target;
         if (!(target instanceof Element) || typeof speechSynthesis === 'undefined') {
