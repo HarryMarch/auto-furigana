@@ -1776,4 +1776,51 @@
     document.addEventListener('scroll', function () {
         translationDom.classList.remove('show');
     });
+
+    document.addEventListener('click', function (e) {
+        const target = e.target;
+        if (!(target instanceof Element) || typeof speechSynthesis === 'undefined') {
+            return;
+        }
+
+        const ruby = target.closest('ruby.chrome-ext-furigana');
+        if (ruby) {
+            return;
+        }
+
+        const range = document.caretRangeFromPoint(e.clientX, e.clientY);
+        const textNode = range?.startContainer;
+        const parentElement = textNode?.parentElement;
+        if (
+            !textNode ||
+            textNode.nodeType !== Node.TEXT_NODE ||
+            !parentElement?.closest('p, span') ||
+            parentElement.closest('ruby')
+        ) {
+            return;
+        }
+
+        const text = textNode.textContent || '';
+        const word = typeof Intl.Segmenter === 'function'
+            ? Array.from(new Intl.Segmenter('ja', { granularity: 'word' }).segment(text))
+                .find(({ segment, index, isWordLike }) =>
+                    isWordLike &&
+                    range.startOffset >= index &&
+                    range.startOffset < index + segment.length
+                )?.segment || ''
+            : '';
+        if (!word) {
+            return;
+        }
+
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-US';
+        const englishVoice = speechSynthesis.getVoices()
+            .find(voice => voice.lang.toLowerCase().startsWith('en'));
+        if (englishVoice) {
+            utterance.voice = englishVoice;
+        }
+        speechSynthesis.speak(utterance);
+    });
 })();
