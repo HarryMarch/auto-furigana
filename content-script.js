@@ -1880,7 +1880,7 @@
             bookmarkButton.type = 'button';
             bookmarkButton.textContent = 'Bookmark';
             bookmarkButton.setAttribute('aria-label', 'Bookmark this video');
-            bookmarkButton.style.cssText = 'position: fixed; top: 5px; right: 16px; z-index: 2147483647; padding: 10px 14px; border: 0; border-radius: 4px; background: #c00; color: #fff; font: 14px sans-serif; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);';
+            bookmarkButton.style.cssText = 'position: fixed; top: 850px; left: 2px; z-index: 2147483647; padding: 10px 14px; border: 0; border-radius: 4px; background: #c00; color: #fff; font: 14px sans-serif; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);';
             bookmarkButton.addEventListener('click', function () {
                 const video = findInOpenShadowRoots('video.html5-main-video') || findInOpenShadowRoots('video');
                 const textarea = findInOpenShadowRoots('form.chatInputViewModelChatInputForm textarea.chatInputViewModelChatInput');
