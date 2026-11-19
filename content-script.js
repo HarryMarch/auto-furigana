@@ -1825,4 +1825,92 @@
         }
         speechSynthesis.speak(utterance);
     });
+
+    // ============== YouTube Ask button click detection ==============
+    document.addEventListener('click', function (e) {
+        const target = e.target;
+        if (!(target instanceof Element)) {
+            return;
+        }
+
+        const clickedAskButton = e.composedPath().some(node =>
+            node instanceof Element && node.matches(
+                'button-view-model.you-chat-entrypoint-button, button-view-model.you-chat-entrypoint-button button'
+            )
+        );
+        if (clickedAskButton) {
+            function findInOpenShadowRoots(selector, root = document) {
+                const match = root.querySelector(selector);
+                if (match) {
+                    return match;
+                }
+
+                for (const element of root.querySelectorAll('*')) {
+                    if (element.shadowRoot) {
+                        const shadowMatch = findInOpenShadowRoots(selector, element.shadowRoot);
+                        if (shadowMatch) {
+                            return shadowMatch;
+                        }
+                    }
+                }
+
+                return null;
+            }
+
+            function formatVideoTimestamp(seconds) {
+                const totalSeconds = Math.floor(Math.max(0, seconds));
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const remainingSeconds = totalSeconds % 60;
+
+                if (hours > 0) {
+                    return `${hours}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+                }
+
+                return `${minutes}:${String(remainingSeconds).padStart(2, '0')}`;
+            }
+
+            console.log('YouTube Ask button click detected');
+            if (document.getElementById('my-custom-bookmark-button')) {
+                return;
+            }
+
+            const bookmarkButton = document.createElement('button');
+            bookmarkButton.id = 'my-custom-bookmark-button';
+            bookmarkButton.type = 'button';
+            bookmarkButton.textContent = 'Bookmark';
+            bookmarkButton.setAttribute('aria-label', 'Bookmark this video');
+            bookmarkButton.style.cssText = 'position: fixed; top: 5px; right: 16px; z-index: 2147483647; padding: 10px 14px; border: 0; border-radius: 4px; background: #c00; color: #fff; font: 14px sans-serif; cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);';
+            bookmarkButton.addEventListener('click', function () {
+                const video = findInOpenShadowRoots('video.html5-main-video') || findInOpenShadowRoots('video');
+                const textarea = findInOpenShadowRoots('form.chatInputViewModelChatInputForm textarea.chatInputViewModelChatInput');
+                if (!video || !textarea) {
+                    console.warn('Could not find the YouTube video or chat textarea');
+                    return;
+                }
+
+                const timestamp = `${formatVideoTimestamp(video.currentTime)} `;
+                const hasWord = /[\p{L}\p{N}]/u.test(textarea.value);
+                const prompt = 'Please pull out the target word from the transcript with the following timestamps and the full sentence it appears in, making sure to bold the word:';
+                const value = hasWord ? textarea.value : `${prompt} `;
+                const start = textarea.selectionStart ?? value.length;
+                const end = textarea.selectionEnd ?? value.length;
+                const insertionPoint = hasWord ? start : value.length;
+                const insertionEnd = hasWord ? end : value.length;
+                const prefix = insertionPoint > 0 && !/\s$/.test(value.slice(0, insertionPoint)) ? ' ' : '';
+                const insertion = prefix + timestamp;
+                const updatedValue = value.slice(0, insertionPoint) + insertion + value.slice(insertionEnd);
+                const valueSetter = Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value')?.set;
+                if (valueSetter) {
+                    valueSetter.call(textarea, updatedValue);
+                } else {
+                    textarea.value = updatedValue;
+                }
+                textarea.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+                textarea.focus();
+                textarea.setSelectionRange(insertionPoint + insertion.length, insertionPoint + insertion.length);
+            });
+            document.body.appendChild(bookmarkButton);
+        }
+    });
 })();
