@@ -1889,7 +1889,7 @@
                     return;
                 }
 
-                const timestamp = `${formatVideoTimestamp(video.currentTime - 0.5)} `;
+                const timestamp = `${formatVideoTimestamp(video.currentTime - 0.75)} `;
                 const hasWord = /[\p{L}\p{N}]/u.test(textarea.value);
                 const prompt = 'Please pull out the target word from the transcript with the following timestamps and the full sentence it appears in, making sure to bold the word:';
                 const value = hasWord ? textarea.value : `${prompt} `;
